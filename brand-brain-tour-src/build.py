@@ -121,7 +121,7 @@ for c, scr, t, d, fa, fp, z, nh, nl, v in SPEC:
     if o: st["o"] = o
     steps.append(st)
 
-start_at = ctr(H['home']['gap'])
+start_at = [50.0, ctr(H['home']['gap'])[1]]  # centred on the screen, in the gap between prompt box and cards
 
 shutil.rmtree(OUT, ignore_errors=True); os.makedirs(OUT + '/img')
 ids = list(dict.fromkeys(['home'] + [s['img'] for s in steps]))
