@@ -2,7 +2,7 @@
 <html lang="en"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Brand OS Tour</title>
+<title>Brand Brain Tour</title>
 <style>
 @font-face{font-family:"Figtree";src:url(data:font/woff2;base64,/*FONT*/) format("woff2");font-weight:300 900;font-display:block}
 :root{
@@ -44,6 +44,17 @@ svg.spot{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;tr
 .chip{position:absolute;height:30px;padding:0 12px;border-radius:999px;background:var(--blue);color:#fff;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;white-space:nowrap;box-shadow:0 8px 20px -8px rgba(47,107,255,.7);opacity:0;transform:translateY(4px);transition:opacity .3s,transform .3s;pointer-events:none;border:0}
 .chip.on{opacity:1;transform:none;pointer-events:auto}
 
+/* overlays drawn on the frame (approval ticks, status pills) */
+#ovl{position:absolute;inset:0;pointer-events:none}
+.ov{position:absolute;transform:translate(-50%,-50%) scale(.3);opacity:0;transition:transform .5s cubic-bezier(.3,1.7,.5,1),opacity .25s}
+.ov.on{transform:translate(-50%,-50%) scale(1);opacity:1}
+.tick{border-radius:50%;background:#16a34a;display:grid;place-items:center;box-shadow:0 0 0 .18em rgba(255,255,255,.95),0 .25em .7em rgba(22,101,52,.45)}
+.tick svg{width:62%;height:62%}
+.tick path{stroke-dasharray:24;stroke-dashoffset:24}
+.ov.on.tick path{transition:stroke-dashoffset .45s .25s ease-out;stroke-dashoffset:0}
+.okpill{background:#16a34a;color:#fff;border-radius:999px;font-weight:650;padding:.45em .95em .45em .7em;white-space:nowrap;display:flex;align-items:center;gap:.45em;box-shadow:0 0 0 .2em rgba(255,255,255,.9),0 .4em 1em rgba(22,101,52,.4)}
+.okpill svg{width:1.15em;height:1.15em}
+@media (prefers-reduced-motion: reduce){.ov,.ov.on.tick path{transition:none}}
 /* caption */
 .cap{position:absolute;width:300px;background:#fff;border-radius:14px;padding:14px 16px 13px;box-shadow:0 0 0 1px rgba(0,0,0,.05),0 18px 40px -18px rgba(10,14,30,.45);transition:left .5s ease,top .5s ease,opacity .3s;opacity:0}
 .cap.on{opacity:1}
@@ -105,7 +116,7 @@ svg.spot{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;tr
     <button class="icon" id="snd" aria-label="Sound on"></button>
   </div>
   <div class="stage" id="stage">
-    <div class="zoom" id="zoom"><img id="imA" alt=""><img id="imB" class="back" alt=""></div>
+    <div class="zoom" id="zoom"><img id="imA" alt=""><img id="imB" class="back" alt=""><div id="ovl"></div></div>
     <svg class="spot" id="spot" style="opacity:0"><defs><mask id="m"><rect width="100%" height="100%" fill="#fff"/><g id="holes"></g></mask></defs><rect id="dimr" width="100%" height="100%" fill="rgba(12,14,22,.46)" mask="url(#m)"/></svg>
     <div id="hls"></div>
     <div class="ring" id="ring" role="button" aria-label="Next step" tabindex="0"></div>
@@ -113,7 +124,7 @@ svg.spot{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;tr
     <div class="cursor" id="cur"><svg viewBox="0 0 26 26" width="26" height="26"><path d="M4 2.5l17 10-7.4 1.7-3.8 7.1z" fill="#2f6bff" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
     <div class="cap" id="cap" aria-live="polite"><div class="k"><b id="capC"></b><span id="capN"></span></div><h3 id="capT"></h3><p id="capD"></p></div>
     <div class="over start show" id="start"><button class="startbtn" id="startBtn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l12.5-7.5z"/></svg>Take an interactive Tour</button></div>
-    <div class="over end" id="end"><div><div class="logo">/*LOGO*/</div><h2>That's Brand OS</h2><p>One brand brain behind every agent: creative, moderation, insights and paid media, working from the same knowledge of your brand.</p><button id="replay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 2.6-6.4L3 8 M3 3v5h5"/></svg>Replay</button></div></div>
+    <div class="over end" id="end"><div><div class="logo">/*LOGO*/</div><h2>That's Brand Brain</h2><p>One shared brain behind every agent: creative, moderation, insights and paid media, all working from the same knowledge of your brand.</p><button id="replay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 2.6-6.4L3 8 M3 3v5h5"/></svg>Replay</button></div></div>
   </div>
   <div class="below" id="below" aria-live="polite"><div class="k" id="belC"></div><h3 id="belT"></h3><p id="belD"></p></div>
   <div class="ctrl">
@@ -128,10 +139,11 @@ svg.spot{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;tr
 /* ===== Settings ===== */
 const CONFIG = {
   voice: "browser",        // "browser" = device text-to-speech (placeholder) · "files" = audio/00.mp3 … audio/18.mp3 · "off"
-  voiceLang: "en-US",
-  voiceRate: 1.0,
+  voiceLang: "en-IN",      // Indian English; falls back to the closest English voice on the device
+  voiceRate: 0.93,         // a little slower, for clarity
+  voicePitch: 1.12,        // a little higher and warmer
   beatDelay: 2600,         // ms before a transition step zooms out to show the next product
-  intro: "Here's a quick tour of Brand OS: five AI products that share one brain about your brand."
+  intro: /*INTRO*/
 };
 /* Steps. Coordinates are % of the 2560×1440 frame, measured from the rendered screens.
    p = click point, a = area the step explains, h = next product's sidebar item (transition steps), z = max zoom */
@@ -165,6 +177,7 @@ function size(){
   zoom.style.width = W + 'px'; zoom.style.height = H + 'px';
   tour.classList.toggle('narrow', W < 720); tour.classList.toggle('mid', W >= 720 && W < 1000);
   cap.style.width = Math.round(Math.min(320, Math.max(230, W*0.25))) + 'px';
+  if (typeof sizeOv === 'function') sizeOv();
   if (i >= 0 && !ended) { const t = target(); view = t.v; curPt = t.pt; render(1); placeCap(); }
   placeStart();
 }
@@ -229,7 +242,7 @@ function placeCap(){
   const cw = cap.offsetWidth, ch = cap.offsetHeight, m = 14;
   const spots = [[W-cw-m,H-ch-m],[m,H-ch-m],[W-cw-m,m],[m+0,m+0],[W-cw-m,(H-ch)/2]];
   const ov = ([x,y]) => boxes.reduce((a,[bx,by,bw,bh]) => a + Math.max(0,Math.min(x+cw,bx+bw)-Math.max(x,bx))*Math.max(0,Math.min(y+ch,by+bh)-Math.max(y,by)), 0);
-  let best = spots[0], bo = Infinity; spots.forEach(p=>{ const o = ov(p); if (o < bo - 1) { bo = o; best = p; } });
+  let best = spots[0], bo = Infinity; spots.forEach(p=>{ const o = ov(p) + (p[1] < H/3 ? cw*ch*0.12 : 0); if (o < bo - 1) { bo = o; best = p; } }); // bottom corners preferred unless they cover much more
   cap.style.left = best[0]+'px'; cap.style.top = best[1]+'px';
 }
 
@@ -241,6 +254,8 @@ function showImg(id){
   (nx.decode ? nx.decode() : Promise.resolve()).then(swap, swap);
 }
 const later = (f,ms) => timers.push(setTimeout(f,ms));
+const ovl = $('ovl');
+function sizeOv(){ ovl.querySelectorAll('[data-s]').forEach(e => { const px = e.dataset.s/100*W; e.style.width = e.style.height = px + 'px'; }); ovl.querySelectorAll('[data-f]').forEach(e => e.style.fontSize = (e.dataset.f/100*W) + 'px'); }
 function go(n){
   if (n < 0) return;
   timers.forEach(clearTimeout); timers = []; stopVoice();
@@ -248,6 +263,12 @@ function go(n){
   ended = false; $('end').classList.remove('show'); $('start').classList.remove('show');
   i = n; beat = 0; const s = STEPS[i];
   showImg(s.img);
+  const CHK = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  ovl.innerHTML = (s.o || []).map(o => o.k === 'tick'
+    ? `<div class="ov tick" data-s="${o.s}" style="left:${o.c[0]}%;top:${o.c[1]}%">${CHK}</div>`
+    : `<div class="ov okpill" data-f="${o.s}" style="left:${o.c[0]}%;top:${o.c[1]}%"><span class="tick" style="width:1.35em;height:1.35em;box-shadow:none;background:rgba(255,255,255,.22)">${CHK.replace('<path','<path style="stroke-dashoffset:0"')}</span>${o.t}</div>`).join('');
+  sizeOv();
+  [...ovl.children].forEach((e, k) => later(() => e.classList.add('on'), s.o[k].d));
   setScene([{r:s.a}], s.h ? null : s.p, null);
   cur.classList.add('on'); hls.style.opacity = 1; $('spot').style.opacity = 1;
   animateTo(target());
@@ -265,12 +286,13 @@ function go(n){
 }
 function finish(){
   timers.forEach(clearTimeout); timers=[]; stopVoice(); ended = true; i = STEPS.length;
+  ovl.innerHTML = '';
   setScene([], null, null); cur.classList.remove('on'); cap.classList.remove('on'); $('spot').style.opacity = 0;
   animateTo({v:{s:1,tx:0,ty:0}, pt:curPt}, 700);
   $('end').classList.add('show');
   document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
   $('bar').style.width='100%'; $('count').textContent = 'Done'; $('next').disabled = true; $('prev').disabled = false;
-  $('belC').textContent = ''; $('belT').textContent = "That's Brand OS"; $('belD').textContent = 'Press Replay to watch again.';
+  $('belC').textContent = ''; $('belT').textContent = "That's Brand Brain"; $('belD').textContent = 'Press Replay to watch again.';
 }
 function begin(withIntro){ started = true; tour.classList.add('run'); $('start').classList.remove('show'); unlockVoice(); introPending = withIntro; }
 let introPending = false;
@@ -279,7 +301,21 @@ let introPending = false;
 let audio = null;
 function unlockVoice(){ if (CONFIG.voice === 'files' && !audio) audio = new Audio(); if (CONFIG.voice === 'browser' && 'speechSynthesis' in window) speechSynthesis.cancel(); }
 function stopVoice(){ if ('speechSynthesis' in window) speechSynthesis.cancel(); if (audio) { audio.pause(); audio.onended = null; } }
-function pickVoice(){ const vs = speechSynthesis.getVoices(); return vs.find(v=>v.lang===CONFIG.voiceLang && /natural|google|samantha|aria|jenny/i.test(v.name)) || vs.find(v=>v.lang===CONFIG.voiceLang) || vs.find(v=>/^en/.test(v.lang)); }
+let voiceCache = null;
+function pickVoice(){
+  if (voiceCache) return voiceCache;
+  const vs = speechSynthesis.getVoices(); if (!vs.length) return null;
+  const rank = [
+    v => /en[-_]IN/i.test(v.lang) && /neerja|heera|veena|kajal|aditi|raveena|swara|female/i.test(v.name),
+    v => /en[-_]IN/i.test(v.lang) && !/rishi|prabhat|ravi|hemant|male/i.test(v.name),
+    v => /en[-_]IN/i.test(v.lang),
+    v => /^en/i.test(v.lang) && /sonia|libby|serena|kate|female|zira|samantha|karen|moira|tessa/i.test(v.name),
+    v => /^en/i.test(v.lang)
+  ];
+  for (const f of rank) { const v = vs.find(f); if (v) return (voiceCache = v); }
+  return null;
+}
+if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = () => { voiceCache = null; };
 function speak(n){
   if (!started || !sound || CONFIG.voice === 'off') return;
   const withIntro = introPending; introPending = false;
@@ -289,7 +325,7 @@ function speak(n){
     return;
   }
   if (!('speechSynthesis' in window)) return;
-  const say = txt => { const u = new SpeechSynthesisUtterance(txt); const v = pickVoice(); if (v) u.voice = v; u.lang = CONFIG.voiceLang; u.rate = CONFIG.voiceRate; speechSynthesis.speak(u); };
+  const say = txt => { const u = new SpeechSynthesisUtterance(txt); const v = pickVoice(); if (v) u.voice = v; u.lang = v ? v.lang : CONFIG.voiceLang; u.rate = CONFIG.voiceRate; u.pitch = CONFIG.voicePitch; speechSynthesis.speak(u); };
   if (withIntro) say(CONFIG.intro);
   say(STEPS[n].v || (STEPS[n].t + '. ' + STEPS[n].d));
 }
@@ -311,7 +347,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowRight') { e.preventDefault(); nextStep(); }
   if (e.key === 'ArrowLeft') { e.preventDefault(); $('prev').onclick(); }
 });
-window.BrandOSTour = { go, get step(){ return i; }, get beat(){ return beat; }, showBeat2(){ const s=STEPS[i]; if(s&&s.h){ timers.forEach(clearTimeout); timers=[]; beat=1; setScene([{r:s.a},{r:s.h,next:true}], s.hp, s.h, s.next); view=target().v; curPt=target().pt; render(); placeCap(); } }, settle(){ cancelAnimationFrame(anim); const t=target(); view=t.v; curPt=t.pt; render(); placeCap(); } };
+window.BrandBrainTour = { go, get step(){ return i; }, get beat(){ return beat; }, showBeat2(){ const s=STEPS[i]; if(s&&s.h){ timers.forEach(clearTimeout); timers=[]; beat=1; setScene([{r:s.a},{r:s.h,next:true}], s.hp, s.h, s.next); view=target().v; curPt=target().pt; render(); placeCap(); } }, settle(){ cancelAnimationFrame(anim); const t=target(); view=t.v; curPt=t.pt; render(); placeCap(); } };
 setSound(true); $('prev').disabled = true; $('count').textContent = `0 / ${STEPS.length}`;
 size(); requestAnimationFrame(size);
 </script>

@@ -11,7 +11,7 @@ const [file,out]=process.argv.slice(2);
  const steps=await p.evaluate(()=>STEPS.length);const cur=[];
  await p.click('#startBtn');
  for(let n=0;n<steps;n++){
-  await p.evaluate(n=>BrandOSTour.go(n),n);await p.waitForTimeout(1300);
+  await p.evaluate(n=>BrandBrainTour.go(n),n);await p.waitForTimeout(2300);
   const tag=String(n+1).padStart(2,'0');
   const hasH=await p.evaluate(n=>!!STEPS[n].h,n);
   await p.screenshot({path:`${out}/1500_${tag}${hasH?'a':''}.png`});
@@ -21,8 +21,8 @@ const [file,out]=process.argv.slice(2);
  await p.click('#next');await p.waitForTimeout(1000);await p.screenshot({path:`${out}/1500_end.png`});
  for(const [w,h] of [[400,760],[768,900]]){const q=await pg(w,h);await q.screenshot({path:`${out}/${w}_start.png`});
   await q.click('#startBtn');await q.waitForTimeout(1300);await q.screenshot({path:`${out}/${w}_01.png`});
-  await q.evaluate(()=>BrandOSTour.go(9));await q.waitForTimeout(1300);await q.screenshot({path:`${out}/${w}_10.png`});
-  await q.evaluate(()=>BrandOSTour.go(STEPS.length));await q.waitForTimeout(900);await q.screenshot({path:`${out}/${w}_end.png`});
+  await q.evaluate(()=>BrandBrainTour.go(9));await q.waitForTimeout(1300);await q.screenshot({path:`${out}/${w}_10.png`});
+  await q.evaluate(()=>BrandBrainTour.go(STEPS.length));await q.waitForTimeout(900);await q.screenshot({path:`${out}/${w}_end.png`});
   const sw=await q.evaluate(()=>[document.documentElement.scrollWidth,innerWidth]);if(sw[0]>sw[1])errs.push(w+' HSCROLL '+sw);}
  fs.writeFileSync(`${out}/cursor.json`,JSON.stringify(cur));fs.writeFileSync(`${out}/errors.txt`,errs.join('\n'));
  console.log('errors:',errs.length);errs.slice(0,20).forEach(e=>console.log(e));await b.close();})();
