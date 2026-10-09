@@ -65,9 +65,9 @@ so don't edit them by hand unless a screen changes.
 
 4. Voiceover
 ------------
-The narration in audio/ is the approved Brand Brain voice, recorded from the demo, cleaned up
-(background noise reduced) and loudness-normalised to -16 LUFS. About 4.5 minutes in total.
-Every visitor hears this same voice, on any laptop or phone.
+The narration in audio/ is the approved Brand Brain voice, recorded from the demo and cleaned:
+only the voice is kept (pauses are true silence, background noise removed under the speech),
+loudness-normalised to -16 LUFS. About 4.5 minutes in total. Every visitor hears this same voice.
 To use a different recording, replace the files keeping the same names (00 = intro before step 1,
 01-18 = steps, nothing for the end screen).
 
