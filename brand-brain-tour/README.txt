@@ -47,11 +47,10 @@ a taller box reads better, e.g. aspect-ratio: 4/5 under a 720px media query.
   CONFIG.voice      "browser"  device text-to-speech (placeholder, default)
                     "files"    recorded voiceover from audio/ (see 4)
                     "off"      no sound
-  CONFIG.voiceLang  "en-IN"    Indian English. The page picks the warmest en-IN voice on the device
-                               (e.g. Neerja on Edge/Windows, Veena on Mac/iPhone, Google en-IN on Android),
-                               then falls back to another English voice.
-  CONFIG.voiceRate  0.93       slightly slower than normal, for clarity
-  CONFIG.voicePitch 1.12       slightly higher, for a warmer, friendlier tone
+  CONFIG.voiceLang  "en-IN"    Indian English first. Voice order: the device's first en-IN voice,
+                               then Google UK English Female, Samantha, Google US English, any en-GB, any en-US.
+  CONFIG.voiceRate  1.0        natural speed
+  CONFIG.voicePitch 1.0        natural pitch (shifting rate or pitch makes device voices sound robotic)
   CONFIG.beatDelay  2600       ms before a transition step zooms out to the next product
   CONFIG.intro      the line spoken before step 1 in "browser" mode
 

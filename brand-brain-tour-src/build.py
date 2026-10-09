@@ -136,17 +136,24 @@ logo = ('<svg viewBox="0 0 44 44" width="100%" height="100%"><defs><linearGradie
         '<circle cx="22" cy="22" r="22" fill="url(#lg)"/><g transform="translate(6 6) scale(1.333)">'
         '<path d="M13.6 5.3c2.4-1.6 4.6-2 6.4-1.8.2 1.8-.2 4-1.8 6.4l-4.6 4.6-4.6-4.6z" fill="#fff"/><path d="M9.6 9.3l-3.2-.2-2.2 2.4 3.6.8z M14.7 14.4l.2 3.2-2.4 2.2-.8-3.6z" fill="#fff"/>'
         '<path d="M7.3 15.2c-1.6.3-2.7 1.6-3 3.8 2.2-.3 3.5-1.4 3.8-3z" fill="#fff"/></g></svg>')
-base = (src.replace('/*FONT*/', font).replace('/*LOGO*/', logo)
+AUD = os.path.join(B, 'audio')
+clips = sorted(f for f in os.listdir(AUD) if f.endswith('.mp3')) if os.path.isdir(AUD) else []
+have_audio = len(clips) == len(steps) + 1
+voice = '"files"' if have_audio else '"browser"'
+base = (src.replace('/*FONT*/', font).replace('/*VOICE*/', voice).replace('/*LOGO*/', logo)
            .replace('/*STEPS*/', json.dumps(steps, ensure_ascii=False))
            .replace('/*INTRO*/', json.dumps(INTRO))
            .replace('/*STARTAT*/', json.dumps(start_at)))
-open(f'{OUT}/index.html', 'w').write(base.replace('/*IMG*/', json.dumps({k: f'img/{k}.webp' for k in ids})))
+open(f'{OUT}/index.html', 'w').write(base.replace('/*IMG*/', json.dumps({k: f'img/{k}.webp' for k in ids})).replace('/*AUDIO*/', '{}'))
+if have_audio:
+    shutil.copytree(AUD, f'{OUT}/audio')
+audio_data = {int(f[:2]): 'data:audio/mpeg;base64,' + base64.b64encode(open(os.path.join(AUD, f), 'rb').read()).decode() for f in clips} if have_audio else {}
 shutil.copy(f'{B}/README.txt', f'{OUT}/README.txt')
 data = {k: 'data:image/webp;base64,' + base64.b64encode(open(f'{OUT}/img/{k}.webp', 'rb').read()).decode() for k in ids}
-open(os.path.join(B, 'out', 'brand-brain-tour-preview.html'), 'w').write(base.replace('/*IMG*/', json.dumps(data)))
+open(os.path.join(B, 'out', 'brand-brain-tour-preview.html'), 'w').write(base.replace('/*IMG*/', json.dumps(data)).replace('/*AUDIO*/', json.dumps(audio_data)))
 with zipfile.ZipFile(os.path.join(B, 'out', 'Brand-Brain-Interactive-Tour.zip'), 'w', zipfile.ZIP_DEFLATED) as z:
     for r, _, fs in os.walk(OUT):
         for f in sorted(fs):
             p = os.path.join(r, f); z.write(p, os.path.relpath(p, os.path.join(B, 'out')))
 json.dump({"intro": INTRO, "steps": steps}, open(os.path.join(B, 'steps.json'), 'w'), indent=1, ensure_ascii=False)
-print('steps', len(steps), 'start', start_at)
+print('steps', len(steps), 'start', start_at, 'voice', voice, 'clips', len(clips))

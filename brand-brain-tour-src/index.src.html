@@ -10,6 +10,7 @@
   --blue:#2f6bff; --blue-soft:rgba(47,107,255,.16); --dim:rgba(12,14,22,.46);
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:Figtree,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
 button{font:inherit;color:inherit;cursor:pointer}
 .tour{display:flex;flex-direction:column;align-items:center;gap:10px;padding:10px 12px 12px;height:100%;justify-content:center}
@@ -138,10 +139,10 @@ svg.spot{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;tr
 <script>
 /* ===== Settings ===== */
 const CONFIG = {
-  voice: "browser",        // "browser" = device text-to-speech (placeholder) · "files" = audio/00.mp3 … audio/18.mp3 · "off"
-  voiceLang: "en-IN",      // Indian English; falls back to the closest English voice on the device
-  voiceRate: 0.93,         // a little slower, for clarity
-  voicePitch: 1.12,        // a little higher and warmer
+  voice: /*VOICE*/,        // "files" = recorded narration audio/00.mp3 … audio/18.mp3 · "browser" = device text-to-speech · "off"
+  voiceLang: "en-IN",      // Indian English first; see pickVoice() for the fallback order
+  voiceRate: 1.0,          // natural speed (changing rate or pitch makes device voices sound robotic)
+  voicePitch: 1.0,
   beatDelay: 2600,         // ms before a transition step zooms out to show the next product
   intro: /*INTRO*/
 };
@@ -150,6 +151,7 @@ const CONFIG = {
 const STEPS = /*STEPS*/;
 const CHAPTERS = ["Brand Brain","Creative AI","Brand Moderator","Consumer Insights","AI Paid Media"];
 const IMG = /*IMG*/;
+const AUDIO = /*AUDIO*/;   // embedded clips (single-file preview); empty = load audio/NN.mp3
 const START_IMG = "home", START_AT = /*STARTAT*/;
 
 const $ = id => document.getElementById(id);
@@ -301,26 +303,14 @@ let introPending = false;
 let audio = null;
 function unlockVoice(){ if (CONFIG.voice === 'files' && !audio) audio = new Audio(); if (CONFIG.voice === 'browser' && 'speechSynthesis' in window) speechSynthesis.cancel(); }
 function stopVoice(){ if ('speechSynthesis' in window) speechSynthesis.cancel(); if (audio) { audio.pause(); audio.onended = null; } }
-let voiceCache = null;
-function pickVoice(){
-  if (voiceCache) return voiceCache;
-  const vs = speechSynthesis.getVoices(); if (!vs.length) return null;
-  const rank = [
-    v => /en[-_]IN/i.test(v.lang) && /neerja|heera|veena|kajal|aditi|raveena|swara|female/i.test(v.name),
-    v => /en[-_]IN/i.test(v.lang) && !/rishi|prabhat|ravi|hemant|male/i.test(v.name),
-    v => /en[-_]IN/i.test(v.lang),
-    v => /^en/i.test(v.lang) && /sonia|libby|serena|kate|female|zira|samantha|karen|moira|tessa/i.test(v.name),
-    v => /^en/i.test(v.lang)
-  ];
-  for (const f of rank) { const v = vs.find(f); if (v) return (voiceCache = v); }
-  return null;
-}
-if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = () => { voiceCache = null; };
+// Same voice choice as the approved build: first Indian English voice on the device, then Google UK English Female, Samantha, …
+function pickVoice(){ const v = speechSynthesis.getVoices(); const pref = [/en-IN/i, /Google UK English Female/i, /Samantha/i, /Google US English/i, /en-GB/i, /en-US/i]; for (const p of pref) { const m = v.find(x => p.test(x.lang) || p.test(x.name)); if (m) return m; } return v[0]; }
+if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = () => {};
 function speak(n){
   if (!started || !sound || CONFIG.voice === 'off') return;
   const withIntro = introPending; introPending = false;
   if (CONFIG.voice === 'files') {
-    const play = (k, then) => { audio.src = `audio/${String(k).padStart(2,'0')}.mp3`; audio.onended = then || null; audio.play().catch(()=>{}); };
+    const play = (k, then) => { audio.src = AUDIO[k] || `audio/${String(k).padStart(2,'0')}.mp3`; audio.onended = then || null; audio.play().catch(()=>{}); };
     if (withIntro) play(0, () => { if (i === n) play(n+1); }); else play(n+1);
     return;
   }
@@ -348,7 +338,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowLeft') { e.preventDefault(); $('prev').onclick(); }
 });
 window.BrandBrainTour = { go, get step(){ return i; }, get beat(){ return beat; }, showBeat2(){ const s=STEPS[i]; if(s&&s.h){ timers.forEach(clearTimeout); timers=[]; beat=1; setScene([{r:s.a},{r:s.h,next:true}], s.hp, s.h, s.next); view=target().v; curPt=target().pt; render(); placeCap(); } }, settle(){ cancelAnimationFrame(anim); const t=target(); view=t.v; curPt=t.pt; render(); placeCap(); } };
-setSound(true); $('prev').disabled = true; $('count').textContent = `0 / ${STEPS.length}`;
+setSound(CONFIG.voice !== 'off'); $('snd').hidden = CONFIG.voice === 'off'; $('prev').disabled = true; $('count').textContent = `0 / ${STEPS.length}`;
 size(); requestAnimationFrame(size);
 </script>
 </body></html>
