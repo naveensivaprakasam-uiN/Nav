@@ -65,8 +65,9 @@ so don't edit them by hand unless a screen changes.
 
 4. Voiceover
 ------------
-The narration in audio/ was generated with Kokoro, an open-source neural voice model (Apache 2.0),
-using its Indian English female voice "hf_alpha", loudness-normalised to -16 LUFS. Total about 4.5 minutes.
+The narration in audio/ is the approved Brand Brain voice, recorded from the demo, cleaned up
+(background noise reduced) and loudness-normalised to -16 LUFS. About 4.5 minutes in total.
+Every visitor hears this same voice, on any laptop or phone.
 To use a different recording, replace the files keeping the same names (00 = intro before step 1,
 01-18 = steps, nothing for the end screen).
 

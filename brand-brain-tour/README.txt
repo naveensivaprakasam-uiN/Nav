@@ -4,6 +4,7 @@ Zocket Brand Brain: interactive product tour
 What's in this folder
   index.html   the tour (Figtree font, logo and all code embedded; no external requests)
   img/         19 screens, 2560x1440 WebP (quality 92)
+  audio/       19 narration clips, MP3 (00 = intro, 01-18 = steps)
   README.txt   this file
 
 Open index.html in a browser to try it. Keep img/ next to index.html.
@@ -44,9 +45,10 @@ a taller box reads better, e.g. aspect-ratio: 4/5 under a 720px media query.
 
 3. Settings (top of the <script> in index.html)
 -----------------------------------------------
-  CONFIG.voice      "browser"  device text-to-speech (placeholder, default)
-                    "files"    recorded voiceover from audio/ (see 4)
-                    "off"      no sound
+  CONFIG.voice      "files"    recorded narration in audio/00.mp3 … audio/18.mp3 (default; included)
+                    "browser"  device text-to-speech instead of the recordings
+                    "off"      no sound, and the sound button is hidden
+  (used only in "browser" mode)
   CONFIG.voiceLang  "en-IN"    Indian English first. Voice order: the device's first en-IN voice,
                                then Google UK English Female, Samantha, Google US English, any en-GB, any en-US.
   CONFIG.voiceRate  1.0        natural speed
@@ -61,15 +63,13 @@ and z (zoom limit), all in % of the frame. These were measured from the rendered
 so don't edit them by hand unless a screen changes.
 
 
-4. Voiceover files
-------------------
-Set CONFIG.voice = "files" and add a folder audio/ next to index.html:
-
-  audio/00.mp3   intro (plays after the Tour button, before step 1)
-  audio/01.mp3   step 1
-  ...
-  audio/18.mp3   step 18
-  (nothing for the end screen)
+4. Voiceover
+------------
+The narration in audio/ is the approved Brand Brain voice, recorded from the demo, cleaned up
+(background noise reduced) and loudness-normalised to -16 LUFS. About 4.5 minutes in total.
+Every visitor hears this same voice, on any laptop or phone.
+To use a different recording, replace the files keeping the same names (00 = intro before step 1,
+01-18 = steps, nothing for the end screen).
 
 Script, one line per file. Record it with a warm, clear Indian English female voice, at an
 unhurried pace, as if walking a senior client through the product:
