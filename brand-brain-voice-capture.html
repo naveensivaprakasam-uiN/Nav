@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brand Brain Voice Capture</title>
+<style>
+:root{--ink:#14151a;--mute:#5f616b;--line:#e3e4e8;--bg:#f5f6f8;--card:#fff;--blue:#2f6bff;--ok:#16a34a;--bad:#dc2626}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:860px;margin:0 auto;padding:28px 16px 60px}
+h1{font-size:24px;margin:0 0 4px}
+.sub{color:var(--mute);margin:0 0 18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:14px}
+ol{margin:6px 0 0;padding-left:20px}ol li{margin:5px 0}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+button{font:inherit;font-weight:600;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--ink);padding:9px 16px;cursor:pointer}
+button.pri{background:var(--blue);border-color:var(--blue);color:#fff;padding:12px 22px;font-size:16px}
+button:disabled{opacity:.45;cursor:default}
+.pill{font-size:13px;font-weight:600;padding:6px 11px;border-radius:999px;background:#eef1f8;color:#333}
+.meter{width:160px;height:10px;border-radius:5px;background:#e9eaee;overflow:hidden}.meter i{display:block;height:100%;width:0;background:var(--ok);transition:width .08s}
+#msg{margin-top:10px;font-weight:600}
+#msg.bad{color:var(--bad)}#msg.ok{color:var(--ok)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+td{border-top:1px solid var(--line);padding:8px 6px;vertical-align:top}
+td.n{width:34px;color:var(--mute);font-variant-numeric:tabular-nums}
+td.s{width:92px;font-weight:600;white-space:nowrap}
+tr.on td{background:rgba(47,107,255,.09)}
+.okc{color:var(--ok)}.badc{color:var(--bad)}
+audio{height:30px;width:190px}
+.wrap{overflow-x:auto}
+</style></head><body><main>
+<h1>Brand Brain voice capture</h1>
+<p class="sub">Records the 19 tour lines in this browser's voice, one clip per line, so the tour can use the same voice on every device.</p>
+
+<div class="card">
+  <b>How to use it (about 5 minutes)</b>
+  <ol>
+    <li>Open this page on the laptop and browser where you like the voice. Check the voice name below.</li>
+    <li>Turn the laptop volume up to a normal level. The recording takes the computer's sound directly, so room noise doesn't matter.</li>
+    <li>Click <b>Start capture</b>. When the browser asks what to share, pick <b>Entire screen</b>, turn on <b>Share system audio</b>, then click <b>Share</b>. On a Mac, if there's no system audio option, choose the tab and turn on <b>Share tab audio</b>.</li>
+    <li>Wait while it plays all 19 lines. Don't play other sounds.</li>
+    <li>Click <b>Download clips</b> and send me the zip file.</li>
+  </ol>
+</div>
+
+<div class="card">
+  <div class="row">
+    <button class="pri" id="go">● Start capture</button>
+    <button id="stop" disabled>Stop</button>
+    <button id="dl" disabled>⬇ Download clips (.zip)</button>
+    <span class="pill" id="voice">Voice: loading…</span>
+    <span class="meter" title="Recording level"><i id="lvl"></i></span>
+  </div>
+  <div id="msg"></div>
+</div>
+
+<div class="card wrap"><table id="tbl"></table></div>
+</main>
+<script>
+const LINES = ["Welcome. In the next few minutes, I'll walk you through Brand Brain by Zocket, and show you how one shared brain powers your creative, your customer conversations, your consumer insights, and your paid media.", "Everything begins on this home screen. Brand Brain is where Zocket keeps one shared memory of your brand: your products, your customers, and your category. Let's open it from the sidebar.", "This is the Sources page. Here you can see everything that feeds Brand Brain: your ad accounts, your social channels, your CRM, and the documents your team has shared. To add something new, we simply click Connect source.", "Connecting a new source takes about a minute. You simply choose the type of data. For example, with Website URL, Brand Brain reads your own website, and your competitors' websites, to pick up brand and market signals.", "All of these sources come together in one live knowledge graph. Reviews, social conversations, news and ad performance are all linked to each other. And every Zocket agent reads from this same graph, so they all understand your brand in the same way. Now, let's see how the creative agent uses it.", "This is AI Designer. Your team writes the brief in plain language, exactly the way they would brief an agency. When we send it, the agent goes to Brand Brain for the right product images, the logo, and your brand guidelines.", "Before it designs anything, the agent shows you the assets it has picked: the product shots and the logo marks. So your team always stays in control. Once these look right, we click Submit assets.", "Every creative can be resized for any placement, in a single click. Here, we are choosing nine by sixteen, for Stories and Reels, and the layout adjusts on its own, without anyone redoing the design.", "And here are the finished creatives, ready in minutes, and fully on brand. Your team reviews them, and once they are approved, they are ready to go live in your campaigns. Next, let's see how Brand Brain keeps your customer conversations on brand as well.", "This is Brand Moderator. Every comment, every review, and every direct message, from every platform, comes into one single queue. The agent flags the complaints and marks their priority, so the important ones are always on top. And you can filter by platform, whenever you need to.", "For each complaint, the agent drafts a reply in your brand's voice. It is calm, it takes ownership, and it moves the conversation to a private message. Your team reviews it, clicks Approve, and the reply is posted right under the customer's comment.", "For routine cases, you can automate the entire process with a rule. Here, whenever a low rating comes in on these channels, the agent replies automatically in your brand voice, and alerts your team. The rule is now active, and the job is done. Next, let's see what customers are saying about you across the market.", "This is Consumer Insights. It shows your share of the conversation in your category, where you rank against your competitors, and how that has moved this month. Here, your brand is at number two, and gaining ground.", "You can also see how people feel about your brand on each platform, and whether that sentiment is improving or slipping. Now, let's connect all of this to your paid media.", "AI Paid Media reads your ad accounts, your analytics, and your attribution tools, together. Google Ads is already connected. Meta Ads is not connected yet, so let's connect it.", "Meta Ads is now connected, and it syncs alongside Google Ads, Google Analytics, and AppsFlyer. Let's open the overview, to see the complete picture.", "The overview gives you your headline numbers: spend, return on ad spend, leads, and cost per lead, compared with the previous period. Alongside, the agent explains the wins, the risks, and how you are pacing against your goals, in plain language.", "Your team does not need to wait for an analyst to build a report. Just describe the dashboard you need, in one sentence, and it is created from your connected sources, and stays live.", "And finally, Signals. The agent ranks what has changed, by its impact on your spend and your results. Click Analyse on any signal, to see the reason behind it, and the recommended fix."];
+function pickVoice(){ const v=speechSynthesis.getVoices(); const pref=[/en-IN/i,/Google UK English Female/i,/Samantha/i,/Google US English/i,/en-GB/i,/en-US/i]; for(const p of pref){ const m=v.find(x=>p.test(x.lang)||p.test(x.name)); if(m) return m; } return v[0]; }
+const $=id=>document.getElementById(id);
+function showVoice(){ const v=pickVoice(); $('voice').textContent='Voice: '+(v? v.name+' ('+v.lang+')' : 'not available in this browser'); }
+speechSynthesis.onvoiceschanged=showVoice; setTimeout(showVoice,300);
+$('tbl').innerHTML=LINES.map((t,i)=>`<tr id="r${i}"><td class="n">${String(i).padStart(2,'0')}</td><td>${t.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</td><td class="s" id="s${i}">–</td><td id="a${i}"></td></tr>`).join('');
+const msg=(t,c='')=>{ $('msg').textContent=t; $('msg').className=c; };
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+let stopped=false, stream=null, clips=[], peak=0, raf=0;
+
+function say(text){ return new Promise(res=>{ const u=new SpeechSynthesisUtterance(text); const v=pickVoice(); if(v){u.voice=v;u.lang=v.lang;} u.rate=1; u.pitch=1; u.onend=res; u.onerror=res; speechSynthesis.speak(u); }); }
+
+async function start(){
+  stopped=false; clips=[]; $('dl').disabled=true;
+  try{
+    stream = await navigator.mediaDevices.getDisplayMedia({ video:true, audio:{ echoCancellation:false, noiseSuppression:false, autoGainControl:false }, systemAudio:'include', selfBrowserSurface:'include', preferCurrentTab:false });
+  }catch(e){ msg('Sharing was cancelled. Click Start capture and choose what to share.','bad'); return; }
+  const at=stream.getAudioTracks();
+  if(!at.length){ stream.getTracks().forEach(t=>t.stop()); msg('No sound was shared. Click Start capture again, choose Entire screen and turn on "Share system audio".','bad'); return; }
+  const audioOnly=new MediaStream(at);
+  const ctx=new AudioContext(); const src=ctx.createMediaStreamSource(audioOnly); const an=ctx.createAnalyser(); an.fftSize=1024; src.connect(an);
+  const buf=new Float32Array(an.fftSize);
+  const tick=()=>{ an.getFloatTimeDomainData(buf); let m=0; for(const x of buf) m=Math.max(m,Math.abs(x)); peak=Math.max(peak,m); $('lvl').style.width=Math.min(100,m*140)+'%'; raf=requestAnimationFrame(tick); }; tick();
+  const mime=['audio/webm;codecs=opus','audio/webm','audio/mp4','audio/ogg;codecs=opus'].find(m=>window.MediaRecorder&&MediaRecorder.isTypeSupported(m))||'';
+  const ext=mime.includes('mp4')?'m4a':mime.includes('ogg')?'ogg':'webm';
+  $('go').disabled=true; $('stop').disabled=false; msg('Capturing… keep this tab open and the sound on.');
+  speechSynthesis.cancel(); await sleep(800);
+  let silent=0;
+  for(let i=0;i<LINES.length && !stopped;i++){
+    document.querySelectorAll('tr').forEach(r=>r.classList.toggle('on',r.id==='r'+i));
+    $('s'+i).textContent='recording…';
+    const chunks=[]; const rec=new MediaRecorder(audioOnly, mime?{mimeType:mime,audioBitsPerSecond:160000}:{});
+    rec.ondataavailable=e=>{ if(e.data.size) chunks.push(e.data); };
+    const done=new Promise(r=>rec.onstop=r);
+    rec.start(); await sleep(350); peak=0;
+    await say(LINES[i]);
+    await sleep(600); rec.stop(); await done;
+    const blob=new Blob(chunks,{type:mime||'audio/webm'});
+    const ok=peak>0.02; if(!ok) silent++;
+    clips[i]={name:String(i).padStart(2,'0')+'.'+ext, blob};
+    $('s'+i).innerHTML= ok ? '<span class="okc">✓ captured</span>' : '<span class="badc">✗ silent</span>';
+    $('a'+i).innerHTML=`<audio controls src="${URL.createObjectURL(blob)}"></audio>`;
+    if(i===0 && !ok){ msg('The first line was recorded as silence, so the voice isn\'t reaching the recording. Click Stop, then Start capture again and pick Entire screen with "Share system audio" turned on.','bad'); }
+  }
+  cancelAnimationFrame(raf); $('lvl').style.width='0'; stream.getTracks().forEach(t=>t.stop()); ctx.close();
+  document.querySelectorAll('tr').forEach(r=>r.classList.remove('on'));
+  $('go').disabled=false; $('stop').disabled=true;
+  const n=clips.filter(Boolean).length;
+  $('dl').disabled=!n;
+  if(stopped) msg(`Stopped after ${n} lines. You can download what was captured, or start again.`, 'bad');
+  else if(silent) msg(`${n} lines recorded, but ${silent} came out silent. Start again with "Share system audio" turned on.`,'bad');
+  else msg('All 19 lines captured. Play a few to check, then click Download clips and send me the zip.','ok');
+}
+
+/* minimal zip writer (no compression) */
+const CRC=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0;}return t;})();
+const crc32=b=>{let c=0xFFFFFFFF;for(let i=0;i<b.length;i++)c=CRC[(c^b[i])&255]^(c>>>8);return(c^0xFFFFFFFF)>>>0;};
+async function makeZip(files){
+  const parts=[], central=[]; let off=0; const enc=new TextEncoder();
+  for(const f of files){
+    const data=new Uint8Array(await f.blob.arrayBuffer()), name=enc.encode(f.name), crc=crc32(data);
+    const h=new DataView(new ArrayBuffer(30)); h.setUint32(0,0x04034b50,true); h.setUint16(4,20,true); h.setUint16(8,0,true); h.setUint32(14,crc,true); h.setUint32(18,data.length,true); h.setUint32(22,data.length,true); h.setUint16(26,name.length,true);
+    parts.push(h.buffer,name,data);
+    const c=new DataView(new ArrayBuffer(46)); c.setUint32(0,0x02014b50,true); c.setUint16(4,20,true); c.setUint16(6,20,true); c.setUint32(16,crc,true); c.setUint32(20,data.length,true); c.setUint32(24,data.length,true); c.setUint16(28,name.length,true); c.setUint32(42,off,true);
+    central.push(c.buffer,name); off+=30+name.length+data.length;
+  }
+  const csize=central.reduce((a,b)=>a+(b.byteLength||b.length),0);
+  const e=new DataView(new ArrayBuffer(22)); e.setUint32(0,0x06054b50,true); e.setUint16(8,files.length,true); e.setUint16(10,files.length,true); e.setUint32(12,csize,true); e.setUint32(16,off,true);
+  return new Blob([...parts,...central,e.buffer],{type:'application/zip'});
+}
+$('go').onclick=start;
+$('stop').onclick=()=>{ stopped=true; speechSynthesis.cancel(); };
+$('dl').onclick=async()=>{ const files=clips.filter(Boolean); const v=pickVoice(); files.push({name:'voice.txt',blob:new Blob([(v?v.name+' ('+v.lang+')':'unknown')+'\n'+navigator.userAgent+'\n'])}); const z=await makeZip(files); const a=document.createElement('a'); a.href=URL.createObjectURL(z); a.download='brand-brain-voice-clips.zip'; document.body.appendChild(a); a.click(); a.remove(); };
+</script></body></html>
