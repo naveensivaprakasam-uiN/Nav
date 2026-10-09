@@ -5,7 +5,7 @@ B=sys.argv[1]
 st=json.load(open(B+'/steps.json'))
 lines=[st['intro']]+[s['v'] for s in st['steps']]
 k=Kokoro('kokoro-v1.0.onnx','voices-v1.0.bin')
-VV=np.load('voices-v1.0.bin'); VOICE=0.3*VV['bf_lily']+0.7*VV['bf_emma']  # closest match to the approved voice
+VV=np.load('voices-v1.0.bin'); VOICE=VV['bf_lily']  # voice D (Lily), chosen by the team
 d='sherpa-onnx-whisper-base.en/'
 rec=sherpa_onnx.OfflineRecognizer.from_whisper(encoder=d+'base.en-encoder.int8.onnx',decoder=d+'base.en-decoder.int8.onnx',tokens=d+'base.en-tokens.txt',language='en',task='transcribe')
 def norm(s): return re.sub(r'[^a-z0-9 ]','',s.lower()).split()

@@ -66,8 +66,8 @@ so don't edit them by hand unless a screen changes.
 4. Voiceover
 ------------
 The narration in audio/ is a studio-clean voice-over generated with Kokoro (open-source neural
-voice model, Apache 2.0, free for commercial use). The voice is a blend of its British English
-female voices (70% Emma, 30% Lily), chosen as the closest match to the voice approved in the demo.
+voice model, Apache 2.0, free for commercial use). The voice is its British English female
+voice "Lily" (bf_lily), chosen by the team.
 Loudness-normalised to -16 LUFS. About 4 minutes in total. Every visitor hears this same voice.
 To use a different recording, replace the files keeping the same names (00 = intro before step 1,
 01-18 = steps, nothing for the end screen).
