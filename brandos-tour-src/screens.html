@@ -1,0 +1,408 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Figtree;src:url(assets/figtree.woff2) format('woff2');font-weight:300 900}
+@font-face{font-family:CG;src:url(assets/cg500.woff2) format('woff2');font-weight:500}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1280px;height:720px;overflow:hidden}
+body{font-family:Figtree,Inter,system-ui,sans-serif;color:#18181b;background:#fbfbfa;font-size:12px;-webkit-font-smoothing:antialiased;position:relative}
+svg.i{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.app{display:flex;height:720px}
+/* sidebar */
+.sb{width:196px;flex:none;background:#f7f7f6;border-right:1px solid #ececea;display:flex;flex-direction:column;padding:10px 10px 8px;position:relative}
+.sb .logo{display:flex;align-items:center;gap:7px;height:30px;padding:0 4px;font-weight:600;font-size:16px;letter-spacing:-.01em}
+.sb .logo .col{margin-left:auto;color:#555}
+.zl{width:24px;height:24px;border-radius:50%;background:linear-gradient(140deg,#4f8cff,#1d4ed8);display:grid;place-items:center;flex:none}
+.zl svg{width:15px;height:15px}
+.ws{display:flex;align-items:center;gap:8px;height:34px;padding:0 6px;margin-top:6px;font-size:12.5px}
+.av{width:22px;height:22px;border-radius:50%;background:#ececec;display:grid;place-items:center;font-size:10.5px;font-weight:600;color:#444;flex:none}
+.ws .chev{margin-left:auto;color:#666}
+.create{margin:8px 0 12px;height:32px;border-radius:16px;background:#111;color:#fff;display:flex;align-items:center;justify-content:center;gap:6px;font-weight:500;font-size:12.5px}
+.nav{display:flex;align-items:center;gap:9px;height:29px;padding:0 9px;border-radius:9px;font-size:12.5px;color:#1f1f22;margin-bottom:1px}
+.nav .r{margin-left:auto;color:#777}
+.nav.on{background:#ececea}
+.sub{display:flex;align-items:center;height:27px;margin-left:24px;padding:0 10px;border-radius:8px;font-size:12px;color:#5c5c62;margin-bottom:1px}
+.sub.on{background:#ececea;color:#18181b;font-weight:500}
+.sb .user{margin-top:auto;display:flex;align-items:center;gap:8px;padding:6px 4px}
+.sb .user b{font-weight:500;font-size:12px;display:block}
+.sb .user span{font-size:10.5px;color:#777}
+.sb .user .ud{margin-left:auto;color:#666}
+/* rail (collapsed) */
+.rail{width:52px;flex:none;background:#f7f7f6;border-right:1px solid #ececea;display:flex;flex-direction:column;align-items:center;padding-top:10px;gap:4px}
+.rail .ri{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;color:#2a2a2e}
+.rail .ri svg.i{width:16px;height:16px}
+.rail .plus{width:30px;height:30px;border-radius:50%;background:#111;color:#fff;display:grid;place-items:center;margin:6px 0}
+/* main */
+.main{flex:1;position:relative;overflow:hidden}
+.top{position:absolute;right:16px;top:9px;display:flex;align-items:center;gap:8px;z-index:3}
+.credits{height:28px;border-radius:14px;background:#111;color:#fff;display:flex;align-items:center;gap:5px;padding:0 13px;font-size:11.5px;font-weight:600}
+.credits svg{width:12px;height:12px;fill:#facc15;stroke:#facc15}
+.circ{width:28px;height:28px;border-radius:50%;background:#f0f0ef;display:grid;place-items:center;font-size:10.5px;font-weight:600;color:#333}
+.wrap{width:860px;margin:0 auto;padding-top:40px}
+.h1{font-size:19px;font-weight:600;letter-spacing:-.01em}
+.muted{color:#6b6b72}
+.card{background:#fff;border:1px solid #ececea;border-radius:12px}
+.btn{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 12px;border-radius:8px;border:1px solid #e6e6e4;background:#fff;font-size:11.5px;font-weight:500;color:#222}
+.btn.dark{background:#111;color:#fff;border-color:#111}
+.pill{display:inline-flex;align-items:center;height:18px;padding:0 7px;border-radius:9px;font-size:9.5px;font-weight:600}
+.tag{display:inline-flex;align-items:center;height:20px;padding:0 8px;border-radius:6px;border:1px solid #e8e8e6;font-size:10px;font-weight:600;color:#555;background:#fff}
+.dot{width:6px;height:6px;border-radius:50%;display:inline-block}
+.scrim{position:absolute;inset:0;background:rgba(20,20,22,.42);z-index:5}
+.modal{position:absolute;z-index:6;background:#f8f8f7;border-radius:14px;box-shadow:0 24px 60px -16px rgba(0,0,0,.35);overflow:hidden}
+.chatbar{position:absolute;left:50%;transform:translateX(-50%);bottom:12px;width:520px;background:#fff;border:1px solid #e8e8e6;border-radius:14px;box-shadow:0 6px 20px -8px rgba(0,0,0,.15);padding:9px 12px;z-index:2}
+.chatbar .in{display:flex;align-items:center;gap:8px;color:#888;font-size:11.5px}
+.chatbar .chips{display:flex;gap:6px;margin-top:8px;align-items:center;font-size:10px;color:#666}
+.chatbar .chips span{border:1px solid #eee;border-radius:7px;padding:3px 7px;color:#333}
+.sendc{width:24px;height:24px;border-radius:50%;background:#ddd;color:#fff;display:grid;place-items:center}
+.sendc.dark{background:#111}
+.sendc svg.i{width:13px;height:13px}
+</style></head>
+<body><div id="root"></div>
+<script>
+const P={
+home:'M3 10l9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z',
+tasks:'M2 13l4 4 8-9 M11 16l1.5 1.5 9.5-10',
+brain:'M12 5a3 3 0 1 0-6 .1 4 4 0 0 0-2.5 5.8 4 4 0 0 0 .6 6.6A4 4 0 1 0 12 18z M12 5a3 3 0 1 1 6 .1 4 4 0 0 1 2.5 5.8 4 4 0 0 1-.6 6.6A4 4 0 1 1 12 18z M12 5v13',
+palette:'M12 22a10 10 0 1 1 10-10c0 2.5-2 3-3.5 3H16a2 2 0 0 0-1.5 3.3A2 2 0 0 1 12 22z M7.5 10.5h.01 M10.5 7h.01 M14.5 7h.01 M17 10.5h.01',
+shield:'M20 13c0 5-3.5 7.5-7.7 9a1 1 0 0 1-.6 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.2-2.7a1.2 1.2 0 0 1 1.6 0C14.5 3.8 17 5 19 5a1 1 0 0 1 1 1z',
+eye:'M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z',
+radio:'M4.9 19.1C1 15.2 1 8.8 4.9 4.9 M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5 M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5 M19.1 4.9C23 8.8 23 15.1 19.1 19 M12 10.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z',
+chart:'M3 3v18h18 M7 14l4-4 4 3 5-6',
+cr:'M9 6l6 6-6 6', cd:'M6 9l6 6 6-6', cl:'M15 6l-6 6 6 6', cu:'M18 15l-6-6-6 6', cud:'M7 15l5 5 5-5 M7 9l5-5 5 5',
+plus:'M12 5v14 M5 12h14', up:'M12 19V5 M5 12l7-7 7 7',
+bell:'M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9 M10.3 21a1.9 1.9 0 0 0 3.4 0',
+zap:'M13 2L3 14h9l-1 8 10-12h-9z',
+globe:'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z M2 12h20 M12 2a15 15 0 0 1 4 10 15 15 0 0 1-4 10 15 15 0 0 1-4-10 15 15 0 0 1 4-10z',
+file:'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6',
+users:'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M9 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z M22 21v-2a4 4 0 0 0-3-3.9 M16 3.1a4 4 0 0 1 0 7.8',
+mega:'M3 11l16-6v14L3 13z M7 13.5V18a2 2 0 0 0 4 0v-3',
+bars:'M3 3v18h18 M8 17v-4 M13 17V9 M18 17V5',
+x:'M18 6L6 18 M6 6l12 12', check:'M20 6L9 17l-5-5',
+spark:'M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z',
+filter:'M22 3H2l8 9.5V19l4 2v-8.5z',
+refresh:'M3 12a9 9 0 0 1 15-6.7L21 8 M21 3v5h-5 M21 12a9 9 0 0 1-15 6.7L3 16 M3 21v-5h5',
+cal:'M4 5h16v16H4z M16 3v4 M8 3v4 M4 11h16',
+msg:'M7.9 20A9 9 0 1 0 4 16.1L2 22z', send:'M22 2L11 13 M22 2l-7 20-4-9-9-4z',
+copy:'M8 8h12v12H8z M16 8V4H4v12h4',
+search:'M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14z M21 21l-4.3-4.3',
+link:'M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7 M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7',
+download:'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4 M7 10l5 5 5-5 M12 15V3',
+mail:'M3 5h18v14H3z M3 6l9 7 9-7',
+trash:'M3 6h18 M8 6V4h8v2 M6 6l1 15h10l1-15',
+thumb:'M7 10v11 M15 5.9 14 10h5.8a2 2 0 0 1 1.9 2.6l-2.3 7A2 2 0 0 1 17.5 21H4a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1h2.8a2 2 0 0 0 1.8-1.1L12 2a3.1 3.1 0 0 1 3 3.9z',
+eyeoff:'M3 3l18 18 M10.6 5.1A10 10 0 0 1 22 12a14 14 0 0 1-2.2 3.1 M6.6 6.6A14 14 0 0 0 2 12s3.5 7 10 7a9.7 9.7 0 0 0 5.4-1.6',
+ext:'M15 3h6v6 M10 14L21 3 M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6',
+crm:'M3 5h18v14H3z M7 9h10 M7 13h6',
+trans:'M5 8l6 6 M4 14l6-6 2-3 M2 5h12 M7 2h1 M22 22l-5-10-5 10 M14 18h6',
+clock:'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z M12 6v6l4 2',
+grid:'M3 3h7v7H3z M14 3h7v7h-7z M14 14h7v7h-7z M3 14h7v7H3z',
+graph:'M5 6a2 2 0 1 0 0 .01 M19 6a2 2 0 1 0 0 .01 M12 18a2 2 0 1 0 0 .01 M6.5 7.5l4.5 9 M17.5 7.5l-4.5 9 M7 6h10',
+img:'M3 3h18v18H3z M9 9a1.5 1.5 0 1 0 0-.01 M21 15l-5-5L5 21',
+video:'M3 5h18v14H3z M10 9l5 3-5 3z',
+mic:'M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z M19 10v2a7 7 0 0 1-14 0v-2 M12 19v3',
+pointer:'M4 3l7 17 2.5-7.5L21 10z', hand:'M18 11V6a2 2 0 0 0-4 0 M14 10V4a2 2 0 0 0-4 0v2 M10 10.5V6a2 2 0 0 0-4 0v8 M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.9-6-2.4l-3.6-3.6a2 2 0 0 1 2.8-2.8L7 15',
+move:'M5 9l-3 3 3 3 M9 5l3-3 3 3 M15 19l-3 3-3-3 M19 9l3 3-3 3 M2 12h20 M12 2v20',
+wand:'M15 4V2 M15 16v-2 M8 9h2 M20 9h2 M17.8 11.8L19 13 M15 9h.01 M17.8 6.2L19 5 M3 21l9-9 M12.2 6.2L11 5',
+layers:'M12 2l10 5-10 5L2 7z M2 17l10 5 10-5 M2 12l10 5 10-5',
+dots:'M12 12h.01 M19 12h.01 M5 12h.01',
+gauge:'M12 14l4-4 M3.3 19a10 10 0 1 1 17.4 0',
+drop:'M12 2.7l5.7 5.6a8 8 0 1 1-11.3 0z',
+plug:'M12 22v-5 M9 8V2 M15 8V2 M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8z',
+sliders:'M4 21v-7 M4 10V3 M12 21v-9 M12 8V3 M20 21v-5 M20 12V3 M1 14h6 M9 8h6 M17 16h6',
+attach:'M21.4 11l-9.2 9.2a6 6 0 0 1-8.5-8.5l9.2-9.2a4 4 0 0 1 5.7 5.7l-9.2 9.2a2 2 0 0 1-2.8-2.8l8.5-8.5'
+};
+const I=(n,cls='')=>`<svg class="i ${cls}" viewBox="0 0 24 24"><path d="${P[n]}"/></svg>`;
+const LOGO=`<span class="zl"><svg viewBox="0 0 24 24"><path d="M13.6 5.3c2.4-1.6 4.6-2 6.4-1.8.2 1.8-.2 4-1.8 6.4l-4.6 4.6-4.6-4.6z" fill="#fff"/><path d="M9.6 9.3l-3.2-.2-2.2 2.4 3.6.8z M14.7 14.4l.2 3.2-2.4 2.2-.8-3.6z" fill="#fff"/><path d="M7.3 15.2c-1.6.3-2.7 1.6-3 3.8 2.2-.3 3.5-1.4 3.8-3z" fill="#fff"/></svg></span>`;
+const NAV=[['home','Home','home'],['tasks','Tasks','tasks'],['bb','Brand Brain','brain'],['ad','AI Designer','palette'],['bm','Brand Moderator','shield'],['ci','Consumer Insights','eye'],['pm','AI Paid Media','radio'],['rep','Reporting','chart']];
+const SUBS={bb:['Overview','Signals','Sources','Skills'],ad:['Create','Apps','Library','Approvals','Activity'],bm:['Review Queue','Rules Engine','Agent Playbook','Action History','AI Researcher'],ci:['Social','Sub-Brands','Ratings','Mentions'],pm:['Overview','Goals','Connectors'],rep:['Dashboards','Reports','Alerts','Playbook']};
+function sidebar(open,sub,topOn){
+  let h=`<aside class="sb"><div class="logo">${LOGO}Zocket<span class="col">${I('cl')}</span></div>
+  <div class="ws"><span class="av">D</span>Demo<span class="chev">${I('cd')}</span></div>
+  <div class="create">${I('plus')}Create</div>`;
+  for(const [k,l,ic] of NAV){
+    const has=SUBS[k];
+    h+=`<div class="nav ${(k===open&&has)||k===topOn?'on':''}" data-hit="nav-${k}">${I(ic)}${l}${has?`<span class="r">${I(k===open?'cd':'cr')}</span>`:''}</div>`;
+    if(k===open&&has) SUBS[k].forEach(s=>h+=`<div class="sub ${s===sub?'on':''}" data-hit="sub-${k}-${s.toLowerCase().replace(/[^a-z]+/g,'-')}">${s}</div>`);
+  }
+  h+=`<div class="user"><span class="av">D</span><div><b>Demo user</b><span>demo@yourbrand.com</span></div><span class="ud">${I('cud')}</span></div></aside>`;
+  return h;
+}
+function rail(){
+  return `<aside class="rail">${LOGO}<div class="ri" style="margin-top:8px">${I('cr')}</div><div class="ri"><span class="av">D</span></div><div class="plus">${I('plus')}</div>
+  ${[['home','home'],['tasks','tasks'],['bb','brain'],['ad','palette'],['bm','shield'],['ci','eye'],['pm','radio'],['rep','chart']].map(([k,ic])=>`<div class="ri" data-hit="rail-${k}">${I(ic)}</div>`).join('')}
+  <div class="ri">${I('dots')}</div><div style="margin-top:auto;margin-bottom:12px"><span class="av">D</span></div></aside>`;
+}
+const topbar=(extra='')=>`<div class="top">${extra}<span class="credits">${I('zap')}111,265 Credits</span><span class="circ">IN</span><span class="circ" style="background:none">${I('bell')}</span></div>`;
+const chatbar=(chips)=>`<div class="chatbar"><div class="in">${I('spark')}<span style="flex:1">Ask anything, attach a playbook, or paste a CSV…</span><span class="btn" style="height:22px;font-size:10.5px;padding:0 8px">${I('plus')}Add Context</span><span class="sendc">${I('up')}</span></div><div class="chips"><b style="font-weight:600;color:#888">TRY</b>${chips.map(c=>`<span>${c}</span>`).join('')}</div></div>`;
+const page=(sb,main,extra='')=>`<div class="app">${sb}<main class="main">${topbar()}${main}</main></div>${extra}`;
+
+/* ---------- screens ---------- */
+const S={};
+S.home=()=>page(sidebar(null,null,'home'),`
+<div style="width:740px;margin:0 auto;padding-top:118px">
+  <div style="text-align:center;font-family:CG,Georgia,serif;font-size:38px;font-weight:500;letter-spacing:-.01em">Greetings, Demo user</div>
+  <div style="text-align:center;color:#6b6b72;font-size:13px;margin-top:6px">What would you like to create with Zocket today?</div>
+  <div class="card" data-hit="prompt" style="margin-top:26px;height:110px;padding:16px 16px 12px;display:flex;flex-direction:column;box-shadow:0 2px 10px -6px rgba(0,0,0,.12)">
+    <div style="color:#8b8b92;font-size:13.5px">Create an image ad for our new summer collection…</div>
+    <div style="margin-top:auto;display:flex;align-items:center"><span class="btn" style="border-radius:14px;background:#f6f6f5;border-color:#f0f0ef">${I('plus')}Add Context</span><span class="sendc dark" style="margin-left:auto;width:28px;height:28px">${I('up')}</span></div>
+  </div>
+  <div id="gap" data-hit="gap" style="height:84px"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px" data-hit="cards">
+    ${[['img','Image Ads','Create stunning image ads for your products, brands or services easily. Edit existing images with AI','#fde7f0','#d6336c'],['video','Video Ads','Create multiple kinds of video ads ranging from Cinematic, UGC and Influencer videos and more','#e3edff','#2f6fe0']].map(([ic,t,d,bg,c])=>`
+    <div class="card" style="padding:16px;display:flex;gap:12px"><span style="width:38px;height:38px;border-radius:9px;background:${bg};color:${c};display:grid;place-items:center;flex:none">${I(ic)}</span><div><b style="font-weight:600;font-size:13px">${t}</b><div class="muted" style="margin-top:4px;line-height:1.45">${d}</div></div></div>`).join('')}
+  </div>
+</div>`);
+
+/* Brand Brain: sources */
+const srcCard=(L,t,s,st,ago,warn)=>`<div class="card" style="padding:12px 13px;height:84px;display:flex;flex-direction:column;${warn?'border-color:#f3d79c':''}">
+  <div style="display:flex;gap:10px;align-items:flex-start"><span class="av" style="border-radius:7px;width:28px;height:28px;background:#f2f2f1">${L}</span><div style="min-width:0;flex:1"><div style="font-weight:500;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t}</div><div class="muted" style="font-size:10.5px;margin-top:1px">${s}</div></div><span class="tag" style="border-radius:10px">OWNED</span></div>
+  <div style="margin-top:auto;display:flex;align-items:center;font-size:10.5px">${st==='live'?'<span style="color:#1f9d55;display:flex;align-items:center;gap:5px"><span class="dot" style="background:#1f9d55"></span>Live</span>':st==='an'?'<span style="display:flex;align-items:center;gap:5px;color:#333">◌ Analysing…</span>':'<span style="color:#b7791f">⚠ Needs attention</span>'}<span class="muted" style="margin-left:auto">${ago}</span></div></div>`;
+const sec=(t,n,d)=>`<div style="display:flex;align-items:baseline;gap:6px;margin:18px 0 9px"><b style="font-weight:600;font-size:13px">${t}</b><span class="muted" style="font-size:11px">${n} · ${d}</span></div>`;
+const sourcesBody=()=>`<div class="wrap" style="padding-top:46px">
+  <div style="display:flex;align-items:flex-start"><div><div class="h1">Sources</div><div class="muted" style="margin-top:3px;font-size:12.5px">What's feeding your Brand Brain, and what's left to connect.</div></div>
+  <div style="margin-left:auto;display:flex;gap:2px;background:#f2f2f1;border-radius:10px;padding:3px"><span class="btn" style="border:none;height:24px">${I('radio')}Connected <span class="dot" style="background:#f59e0b"></span></span><span class="btn" style="border:none;background:none;height:24px;color:#666">${I('sliders')}Setup checklist</span></div></div>
+  <div style="display:flex;align-items:center;margin-top:16px;gap:10px;font-size:11px;color:#555">${I('radio')}<span style="letter-spacing:.03em">16 CONNECTED</span>
+   <span style="display:flex;gap:12px;border:1px solid #ececea;border-radius:9px;padding:5px 10px;background:#fff"><b>All 16</b><span><span style="color:#d97706">⚠</span> Needs attention 3</span><span>◌ Analysing 5</span><span><span class="dot" style="background:#1f9d55"></span> Live 8</span></span>
+   <span class="btn dark" data-hit="connect" style="margin-left:auto;border-radius:16px;height:30px;padding:0 14px;font-size:12px">${I('plus')}Connect source</span></div>
+  <div data-hit="srclist">
+  ${sec('Ad platforms',1,'Paid media accounts &amp; campaign performance.')}
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">${srcCard('M','Meta','API · facebook.com','live','66d ago')}</div>
+  ${sec('Brand presence',3,'Your owned social channels.')}
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">${srcCard('F','Facebook','API · facebook.com','live','45d ago')}${srcCard('I','Instagram','API · instagram.com','live','45d ago')}${srcCard('Y','YouTube','API · youtube.com','live','45d ago')}</div>
+  ${sec('CRM',1,'Where moderated reviews become support cases.')}
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">${srcCard('S','Salesforce','API · salesforce.com','live','2d ago')}</div>
+  ${sec('Documents you added',8,'Files you handed over for us to read.')}
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">${srcCard('U','Brand_Guidelines_2026.pdf','Upload · Document','live','8d ago')}${srcCard('U','Tone_of_Voice_Playbook.docx','Upload · Document','an','8d ago')}${srcCard('U','Category_Review_Memo.docx','Upload · Document','an','8d ago')}</div>
+  </div></div>`;
+S.bb_sources=()=>page(sidebar('bb','Sources'),sourcesBody());
+S.bb_connect=()=>page(sidebar('bb','Sources'),sourcesBody(),`<div class="scrim"></div>
+<div class="modal" data-hit="dialog" style="left:330px;top:110px;width:720px;height:480px;display:flex;flex-direction:column">
+  <div style="padding:20px 24px 16px;border-bottom:1px solid #ebebea;position:relative"><div style="font-size:17px;font-weight:600">Connect a new source</div><div class="muted" style="font-size:12.5px;margin-top:4px">Pick the kind of data you want to bring into Brand Brain.</div><span style="position:absolute;right:20px;top:18px;color:#444">${I('x')}</span></div>
+  <div style="flex:1;display:flex">
+    <div style="width:220px;border-right:1px solid #ebebea;padding:12px 10px">
+      ${[['file','File upload','PDFs, decks, spreadsheets, brand docs'],['globe','Website URL','Your site, partner sites, landing pages'],['users','Social platforms','Meta, X, YouTube, Instagram'],['mega','Ad accounts','Meta Ads, Google Ads'],['bars','Analytics','Google Analytics'],['crm','CRM','Salesforce']].map(([ic,t,d])=>`<div ${t==='Website URL'?'data-hit="opt-website"':''} style="display:flex;gap:10px;padding:7px 9px;border-radius:9px;margin-bottom:2px"><span style="color:#555;margin-top:1px">${I(ic)}</span><div><div style="font-size:12.5px;font-weight:500">${t}</div><div class="muted" style="font-size:11px;line-height:1.35;margin-top:1px">${d}</div></div></div>`).join('')}
+    </div>
+    <div style="flex:1;display:grid;place-items:center;color:#9a9aa0;font-size:12px"><div style="text-align:center"><div style="width:40px;height:40px;border-radius:50%;background:#efefee;display:grid;place-items:center;margin:0 auto 10px;color:#888">${I('plug')}</div>Choose a source type on the left<br>to see its connectors.</div></div>
+  </div>
+  <div style="border-top:1px solid #ebebea;padding:12px 24px;display:flex;align-items:center"><span class="muted" style="font-size:12px">Pick a connector to continue.</span><span class="btn" style="margin-left:auto;border-radius:16px;height:30px;padding:0 16px">Cancel</span></div>
+</div>`);
+
+S.bb_graph=()=>{
+  const nodes0=[['Owned Web App',560,175,'#5aa2e6',9],['Product Catalog',700,185,'#4f7ff0',9],['Brand Corporate',405,295,'#8b5cf6',10],['News PR',540,285,'#f59e0b',10],['Paid Ads',690,305,'#f59e0b',10],['Financial Filings',385,385,'#8a8f98',9],['Ratings Reviews',560,440,'#3bb39a',26],['Branch Footprint',405,460,'#334155',12],['Search SEO',690,435,'#3bb39a',9],['Owned Social',800,400,'#3fb07a',14],['Influencer UGC',820,465,'#e05252',11],['Social Listening',755,505,'#8cc63f',11],['Category Trends',680,560,'#6366f1',11]];
+  const nodes=nodes0.map(([t,x,y,c,r])=>[t,Math.round((x-330)*1.08+100),Math.round(y-40),c,r]);
+  const edges=[[0,1],[0,3],[2,3],[3,4],[1,4],[2,5],[5,7],[7,6],[3,6],[6,11],[4,8],[4,9],[9,10],[10,11],[11,12],[8,12],[6,8]];
+  const svg=`<svg width="100%" height="100%" style="position:absolute;inset:0">${edges.map(([a,b])=>`<line x1="${nodes[a][1]}" y1="${nodes[a][2]}" x2="${nodes[b][1]}" y2="${nodes[b][2]}" stroke="#d9dbe0" stroke-width="1"/>`).join('')}
+  ${nodes.map(([t,x,y,c,r])=>`<circle cx="${x}" cy="${y}" r="${r*2.1}" fill="${c}" opacity=".12"/><circle cx="${x}" cy="${y}" r="${r}" fill="${c}"/><text x="${x+(x>430?r+6:-(r+6))}" y="${y+4}" text-anchor="${x>430?'start':'end'}" font-size="11.5" font-weight="600" fill="#1f1f22" font-family="Figtree">${t}</text>`).join('')}</svg>`;
+  return page(sidebar('bb','Overview'),`<div style="padding:40px 22px 0 34px">
+  <div style="display:flex;align-items:center;gap:8px"><span style="font-size:16px;font-weight:600">Brand Brain</span><span class="pill" style="background:#e9f8ef;color:#1f9d55"><span class="dot" style="background:#1f9d55;margin-right:4px"></span>LIVE · streaming now</span>
+  <span style="margin-left:auto;display:flex;gap:2px;background:#f2f2f1;border-radius:10px;padding:3px"><span class="btn" style="border:none;background:none;color:#555;height:24px">${I('grid')}Signals</span><span class="btn" style="border:none;height:24px">${I('graph')}Graph</span></span></div>
+  <div style="display:flex;gap:12px;margin-top:14px;height:600px" data-hit="graphwrap">
+    <div class="card" style="width:230px;padding:14px;flex:none">
+      <div style="font-weight:500;font-size:12.5px">Industry graph · Signal intake</div>
+      <div style="background:#f7f7f6;border-radius:10px;padding:12px;margin-top:10px"><div style="font-size:26px;font-weight:700;letter-spacing:-.02em">2.3M</div><div class="muted" style="font-size:10.5px">total signals</div>
+      <div style="display:flex;gap:8px;margin-top:10px">${[['14','layers'],['18','connections']].map(([a,b])=>`<div class="card" style="flex:1;padding:8px"><b style="font-size:15px">${a}</b><div class="muted" style="font-size:10px">${b}</div></div>`).join('')}</div></div>
+      <div style="font-size:9.5px;letter-spacing:.04em;color:#666;margin:14px 0 6px">ENRICHING RIGHT NOW — LIVE CATEGORY FEED</div>
+      ${['Shoppers say the new range feels long-lasting','Comfort is the top reason for repeat purchase','Price-to-quality praised by budget-conscious families','Sizing questions rising on the app store','Delivery speed mentioned in 1 of 5 reviews','Return policy flagged in two forums'].map((t,i)=>`<div style="display:flex;gap:7px;align-items:center;font-size:10.5px;padding:5px 0;border-bottom:1px solid #f1f1f0;opacity:${1-i*.11}"><span class="dot" style="background:${['#ef4444','#14b8a6','#334155','#f59e0b','#f59e0b','#ef4444'][i]}"></span><span style="color:#888;font-size:9.5px">REVIEWS</span><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t}</span></div>`).join('')}
+      <div style="font-size:9.5px;letter-spacing:.04em;color:#666;margin:14px 0 8px">AGENTS USING THIS GRAPH</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">${['Brand Data Aggregator','Image Creator','Video Creator','Ads Intelligence'].map(t=>`<span class="tag" style="height:24px;border-radius:12px;font-weight:500;color:#222">${t}</span>`).join('')}</div>
+    </div>
+    <div class="card" data-hit="graph" style="flex:1;position:relative;overflow:hidden">${svg}
+      <div style="position:absolute;left:14px;top:14px;display:flex;flex-direction:column;gap:6px"><span class="circ" style="background:#fff;border:1px solid #eee">${I('plus')}</span><span style="font-size:10px;color:#666;text-align:center">80%</span><span class="circ" style="background:#fff;border:1px solid #eee">−</span></div>
+    </div>
+  </div></div>`);
+};
+
+/* AI Designer */
+S.ad_prompt=()=>page(sidebar('ad','Create'),`<div class="wrap" style="width:900px;padding-top:44px">
+  <div style="display:flex;align-items:center;gap:10px"><span class="circ" style="background:#f2f2f1">${I('palette')}</span><span style="font-size:20px;font-weight:600">AI Designer</span><span class="pill" style="background:#e9f8ef;color:#1f9d55">Agent</span></div>
+  <div class="muted" style="margin:4px 0 0 38px">Studio-quality ad creatives powered by Brand DNA</div>
+  <div class="card" data-hit="promptbox" style="margin-top:18px;padding:16px 18px 12px;box-shadow:0 2px 10px -6px rgba(0,0,0,.12)">
+    <div style="font-size:12.5px;line-height:1.6;color:#1f1f22">Premium straight-on studio fashion photography of two yellow FLOATZ sandals with a relaxed tabby cat, realistic anatomy, crisp fur, skin and EVA texture, soft daylight and subtle shadows.<br><br>White Bata logo top-right, “FROM ₹1,199” bottom-left, and “MAKE / YOURSELF / COMFORTABLE” bottom-right.<br><br>Avoid: crossed legs, twisted ankles, extra toes, floating sandals, distorted footwear, CGI or illustration.</div>
+    <div style="display:flex;align-items:center;margin-top:12px"><span class="btn" style="border-radius:14px;background:#f6f6f5;border-color:#f0f0ef">${I('plus')}Add Context</span><span class="sendc dark" data-hit="send" style="margin-left:auto;width:30px;height:30px">${I('up')}</span></div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px">${[['img','Image Ads','Stunning static ads for products, brands, and services','#fde7f0','#d6336c'],['video','Video Ads','Cinematic, explainer, and promo videos from a brief','#e3edff','#2f6fe0'],['mic','UGC Videos','AI influencer-style videos with authentic voiceovers','#dcf7ee','#13a37a']].map(([ic,t,d,bg,c])=>`<div class="card" style="padding:16px"><span style="width:36px;height:36px;border-radius:9px;background:${bg};color:${c};display:grid;place-items:center">${I(ic)}</span><div style="font-weight:600;font-size:12.5px;margin-top:14px">${t}</div><div class="muted" style="margin-top:3px">${d}</div></div>`).join('')}</div>
+  <div style="display:flex;align-items:baseline;gap:10px;margin:22px 0 10px"><b style="font-size:14.5px;font-weight:600">Featured Tools</b><span class="muted">Popular creative agents</span><span style="margin-left:auto;font-size:11.5px">View all tools →</span></div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">${[['Image Resizer','Resize images for any platform: upload or paste a URL.','#ecebff','#6d5ce6'],['Image Rescaler','Rescale images to exact dimensions, artwork as-is.','#e6f4ff','#2b8de0'],['Variant Generator','Multiple creative variations from one concept.','#f3e8ff','#9b51e0'],['Product Photoshoot','AI-generated product photography.','#ffe8f0','#e0457b']].map(([t,d,bg,c])=>`<div class="card" style="padding:14px"><span style="width:32px;height:32px;border-radius:8px;background:${bg};color:${c};display:grid;place-items:center">${I('move')}</span><div style="font-weight:600;font-size:12px;margin-top:14px">${t}</div><div class="muted" style="margin-top:3px;font-size:11px;line-height:1.4">${d}</div></div>`).join('')}</div>
+</div>`);
+
+const chatHead=`<div style="position:absolute;left:66px;top:12px;display:flex;align-items:center;gap:10px;z-index:3">${I('cl')}<div><div style="font-size:12px;color:#444;font-weight:500">FLOATZ Sandals with Cat</div><div style="font-size:10px;color:#888">You <span class="dot" style="background:#ef4444;width:5px;height:5px"></span> Idle</div></div></div>`;
+const chatTop=`<div class="top"><span class="credits">${I('zap')}111,265 Credits</span><span class="circ" style="background:none">${I('send')}</span><span class="circ" style="background:none">${I('cr')}</span></div>`;
+const composer=(w,left)=>`<div style="position:absolute;left:${left}px;bottom:24px;width:${w}px">
+  <div style="display:flex;gap:2px;margin-left:10px"><span class="btn dark" style="border-radius:8px 8px 0 0;height:26px">${I('spark')}Create</span><span class="btn" style="border:none;background:none;color:#777;height:26px">${I('users')}Collab</span></div>
+  <div class="card" style="padding:11px 12px;box-shadow:0 3px 14px -8px rgba(0,0,0,.15)"><div style="color:#8b8b92;font-size:12px">What do you want to create?</div><div style="display:flex;align-items:center;margin-top:12px"><span class="btn" style="border-radius:14px;background:#f6f6f5;border-color:#f0f0ef;height:24px">${I('plus')}Add Context</span><span class="btn" style="margin-left:auto;border:none;height:24px">${I('drop')}Auto ${I('cd')}</span><span class="sendc" style="margin-left:6px">${I('up')}</span></div></div>
+  <div style="text-align:center;font-size:9.5px;color:#888;margin-top:5px">Zocket aims to deliver reliable information. Please verify before publishing.</div></div>`;
+S.ad_assets=()=>`<div class="app">${rail()}<main class="main" style="background:#fff">${chatHead}${chatTop}
+ <div style="position:absolute;left:150px;top:58px;width:880px">
+  <div style="font-size:12px;color:#444;margin-bottom:10px;display:flex;align-items:center;gap:7px">${I('check')}<span>Explored your brand's knowledge graph and found matching assets. Confirm them to continue.</span></div>
+  <div class="card" data-hit="assets" style="padding:16px;background:#fcfcfb">
+   <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+    <div class="card" style="padding:14px;border-style:dashed">
+      <div style="display:flex;align-items:flex-start"><div><b style="font-weight:600;font-size:12.5px">Product Images</b><div class="muted" style="font-size:10.5px;margin-top:2px">Only the first 10 images will be used for the creative.</div></div><span class="btn" style="margin-left:auto;border-radius:14px">${I('plus')}Add More</span></div>
+      <div style="display:grid;grid-template-columns:repeat(3,112px);gap:10px;margin-top:14px">${[1,2,3,4].map(i=>`<div style="position:relative;width:112px;height:112px;border-radius:10px;background:#f1f1f1;overflow:hidden"><img src="assets/sd${i}.png" style="width:100%;height:100%;object-fit:contain"><span style="position:absolute;right:5px;top:5px;width:16px;height:16px;border-radius:50%;background:#111;color:#fff;display:grid;place-items:center"><svg class="i" viewBox="0 0 24 24" style="width:10px;height:10px;stroke-width:3"><path d="${P.x}"/></svg></span></div>`).join('')}</div>
+    </div>
+    <div class="card" style="padding:14px;border-style:dashed">
+      <div style="display:flex;align-items:flex-start;gap:8px"><div><b style="font-weight:600;font-size:12.5px">Brand Logo &amp; Marks</b><div class="muted" style="font-size:10.5px;margin-top:2px;width:150px">Primary logo plus up to 2 brand marks (badges / endorsement marks).</div></div><span class="btn" style="margin-left:auto;border-radius:14px">${I('plus')}Replace Logo</span><span class="btn" style="border-radius:14px">${I('plus')}Add Mark</span></div>
+      <div style="display:flex;gap:10px;margin-top:14px">${[['Primary','<span style="font-family:Georgia,serif;font-style:italic;font-weight:700;font-size:28px;color:#e11d2a">Bata</span>'],['Mark','<span style="font-weight:800;font-size:16px;letter-spacing:.04em;color:#1e88e5">FLOFOAM</span>']].map(([b,c])=>`<div style="position:relative;width:112px;height:112px;border-radius:10px;background:#f4f4f3;display:grid;place-items:center"><span class="pill" style="position:absolute;left:6px;top:6px;background:#333;color:#fff;height:16px;font-size:9px">${b}</span>${c}</div>`).join('')}</div>
+    </div>
+   </div>
+   <div class="card" style="width:433px;margin-top:14px;padding:22px;text-align:center;border-style:dashed"><span class="circ" style="margin:0 auto">${I('img')}</span><div style="font-weight:500;margin-top:8px">Drop your character references here</div><div class="muted" style="font-size:10.5px;margin-top:4px">PNG, JPG, WEBP, SVG are supported. Keeps a brand character consistent on screen.</div><span class="btn" style="margin-top:10px;border-radius:14px">${I('download')}Browse Device</span></div>
+   <div style="display:flex;justify-content:flex-end;margin-top:4px"><span class="btn dark" data-hit="submit" style="border-radius:16px;height:32px;padding:0 18px;font-size:12px">Submit Assets</span></div>
+  </div>
+ </div>${composer(560,310)}</main></div>`;
+
+const cvTool=`<div style="position:absolute;left:28px;right:28px;top:14px;display:flex;align-items:center;gap:6px;z-index:2"><div class="card" style="display:flex;align-items:center;gap:4px;padding:4px 6px;border-radius:12px">${'<span class="btn" style="border:none;height:26px">'+I('filter')+'All Items '+I('cd')+'</span>'}<span class="circ" style="background:#111;color:#fff;border-radius:8px">${I('pointer')}</span>${['hand','grid','wand','search','move','download'].map(n=>`<span class="circ" style="background:none;border-radius:8px;color:#444">${I(n)}</span>`).join('')}</div><div class="card" style="margin-left:auto;display:flex;gap:2px;padding:4px 6px;border-radius:12px"><span class="btn" style="border:none;height:26px">${I('download')}Download</span><span class="btn" style="border:none;height:26px">${I('move')}Move ${I('cd')}</span><span class="btn" style="border:none;height:26px">${I('clock')}Versions</span></div></div>`;
+const crCard=(i,sel,w=196)=>`<div style="width:${w}px"><div style="display:flex;align-items:center;font-size:9.5px;color:#666;margin-bottom:5px"><span>${i}</span><span style="margin-left:auto">4:5 · 2560 × 3200</span></div><div style="position:relative;outline:${sel?'2px solid #3b82f6':'none'};outline-offset:2px"><img src="assets/cr${i}.png" style="display:block;width:${w}px;height:${Math.round(w*370/297)}px;object-fit:cover;border-radius:2px"></div></div>`;
+const chatLeft=(last)=>`<div style="position:absolute;left:52px;top:0;bottom:0;width:430px;background:#fff;border-right:1px solid #f0f0ef;padding:60px 22px 0 26px">
+ <div style="background:#f6f6f5;border-radius:12px;padding:12px 14px;font-size:11.5px;line-height:1.55;color:#333">Premium straight-on studio fashion photography of two yellow FLOATZ sandals with a relaxed tabby cat, soft daylight and subtle shadows. White Bata logo top-right, “FROM ₹1,199” bottom-left…</div>
+ ${[['brain','Exploring the knowledge graph','3 mins 14 secs'],['img','Extracting and analyzing media assets','48 secs'],['search','Searching the web','9 secs'],['spark','Generating new image concepts','3 mins 58 secs']].map(([ic,t,s])=>`<div style="display:flex;align-items:center;gap:9px;margin-top:13px;font-size:11.5px;color:#333">${I(ic)}${t}<span style="color:#999;font-style:italic;font-size:10px">${s}</span></div>`).join('')}
+ <div style="margin-top:16px;font-size:12px">${last}</div>
+ <div class="card" style="margin-top:12px;padding:0 0 4px;font-size:11px;overflow:hidden"><div style="display:grid;grid-template-columns:1.8fr .7fr 1fr .8fr;padding:9px 12px;font-weight:600;border-bottom:1px solid #f0f0ef"><span>Image Name / Concept</span><span>Ratio</span><span>Resolution</span><span>Status</span></div>${['Cloud Nap Comfort','Kitten Sky Perch','Sunlit Sky Lounge'].map((n,i)=>`<div style="display:grid;grid-template-columns:1.8fr .7fr 1fr .8fr;padding:7px 12px;color:#444"><span>${i+1}. ${n}</span><span>4:5</span><span>2560 × 3200</span><span>Generated</span></div>`).join('')}</div>
+</div>`;
+S.ad_resize=()=>`<div class="app">${rail()}<main class="main" style="background:#fafaf9;background-image:radial-gradient(#e6e6e4 1px,transparent 1px);background-size:14px 14px">${chatHead}${chatTop}
+ ${chatLeft('Done — I created 3 versions of the 4:5 ad. If you want, I can now edit one, run a quality check, or resize them for another platform.')}
+ <div style="position:absolute;left:482px;right:0;top:46px;bottom:0">${cvTool}
+  <div data-hit="canvas" style="position:absolute;left:58px;top:110px;display:flex;gap:26px">${crCard(1,true)}${crCard(2)}${crCard(3)}</div>
+  <div class="card" style="position:absolute;left:150px;bottom:24px;display:flex;align-items:center;gap:4px;padding:5px 6px;border-radius:12px;box-shadow:0 6px 18px -10px rgba(0,0,0,.2)"><span class="btn" style="border:none">${I('wand')}AI Edit</span><span class="btn" style="border:none">${I('layers')}Edit Elements</span><span class="btn" style="border:none">Variants ${I('cd')}</span><span class="btn" style="border:none;background:#f1f1f0" data-hit="resize-btn">Resize ${I('cu')}</span><span class="btn" style="border:none">${I('dots')}</span></div>
+  <div class="card" data-hit="resize-menu" style="position:absolute;left:446px;bottom:68px;width:104px;padding:5px;border-radius:10px;box-shadow:0 12px 30px -12px rgba(0,0,0,.3)">${[['Auto',0],['2:3',[10,15]],['9:16',[9,16]],['3:4',[11,15]],['1:1',[13,13]],['3:2',[15,10]],['16:9',[16,9]],['4:3',[15,11]],['Custom',0]].map(([l,r])=>`<div ${l==='9:16'?'data-hit="r916"':''} style="display:flex;align-items:center;height:26px;padding:0 9px;border-radius:7px;font-size:11.5px;${l==='9:16'?'background:#f2f2f1':''}">${l}${r?`<span style="margin-left:auto;width:${r[0]}px;height:${r[1]}px;border:1.5px solid #555;border-radius:2px"></span>`:''}</div>`).join('')}</div>
+ </div>
+ <div style="position:absolute;left:52px;width:430px;bottom:0">${composer(392,20).replace('position:absolute;left:20px;bottom:24px','position:relative;left:20px;bottom:24px')}</div>
+</main></div>`;
+S.ad_generated=()=>`<div class="app">${rail()}<main class="main" style="background:#fafaf9;background-image:radial-gradient(#e6e6e4 1px,transparent 1px);background-size:14px 14px">${chatHead}${chatTop}
+ ${chatLeft('Done — I created 3 versions of the 4:5 ad.')}
+ <div style="position:absolute;left:482px;right:0;top:46px;bottom:0">${cvTool}
+  <div data-hit="gen" style="position:absolute;left:44px;top:84px;display:flex;gap:18px">${crCard(1,false,204)}${crCard(2,false,204)}${crCard(3,false,204)}</div>
+ </div>
+ <div style="position:absolute;left:52px;width:430px;bottom:0">${composer(392,20).replace('position:absolute;left:20px;bottom:24px','position:relative;left:20px;bottom:24px')}</div>
+</main></div>`;
+
+/* Brand Moderator */
+const bmHead=`<div style="display:flex;align-items:center;gap:8px">${I('shield')}<span style="font-size:19px;font-weight:600">Brand Moderator</span><span class="pill" style="background:#e9f8ef;color:#1f9d55">AGENT</span></div><div class="muted" style="margin-top:4px">AI-powered response generation and comment moderation across all channels</div>
+<div style="display:flex;justify-content:flex-end;margin-top:4px"><span style="display:flex;gap:2px;background:#f2f2f1;border-radius:10px;padding:3px"><span class="btn dark" style="height:24px;border-radius:8px">${I('msg')}Comments</span><span class="btn" style="border:none;background:none;color:#666;height:24px">${I('send')}DMs</span><span class="btn" style="border:none;background:none;color:#666;height:24px">${I('cal')}Scheduled</span></span></div>
+<div style="display:flex;align-items:center;gap:8px;margin-top:12px"><span class="card" style="display:flex;align-items:center;height:32px;width:360px;font-size:11.5px"><span style="padding:0 10px;border-right:1px solid #eee;display:flex;gap:16px">Keyword ${I('cd')}</span><span class="muted" style="padding:0 10px">Search by keyword…</span></span>
+<span class="btn" data-hit="filters" style="margin-left:auto;height:32px">${I('filter')}Filters ${I('cd')}</span><span class="btn" style="height:32px;width:190px">${I('cal')}<span class="muted">Date</span> All Time<span style="margin-left:auto">${I('cd')}</span></span><span class="btn dark" style="height:32px;border-radius:16px">${I('refresh')}Refresh</span></div>`;
+const actions=`<span class="btn">${I('trans')}Translate</span><span class="btn">${I('ext')}Go to post</span><span class="btn">${I('crm')}Send to CRM</span><span class="btn" style="color:#dc2626">${I('trash')}Delete</span>`;
+const comment=(pl,cat,user,ago,txt,status,pri,date,inner,ac=true)=>`<div class="card" style="padding:12px 14px;margin-top:10px">
+ <div style="display:flex;align-items:center;gap:8px;font-size:11.5px"><b style="font-weight:600">${pl}</b><span class="pill" style="background:#eaf2ff;color:#2563eb;border-radius:4px">${cat}</span><span class="muted">${user}</span><span style="margin-left:auto;color:${status==='Flagged'?'#dc2626':'#d97706'};font-weight:600;font-size:10.5px">${status}</span><span style="color:${pri==='HIGH'?'#dc2626':'#666'};font-weight:700;font-size:10.5px">${pri}</span><span class="muted" style="font-size:10.5px">${date}</span></div>
+ <div style="display:flex;align-items:center;gap:8px;margin-top:8px"><span class="av" style="width:20px;height:20px;background:#fdf3d8;color:#a16207">${user[1].toUpperCase()}</span><b style="font-weight:600;font-size:12.5px">${user}</b><span class="muted" style="font-size:10.5px">· ${ago}</span></div>
+ <div style="margin:7px 0 0 28px;background:#fafaf9;border-radius:8px;padding:8px 10px;font-size:12px">${txt}</div>
+ ${inner||''}
+ ${ac?`<div style="display:flex;gap:6px;margin-top:10px">${inner?'':`<span class="btn dark">${I('spark')}Generate Response</span><span class="btn">${I('eyeoff')}Ignore</span>`}<span style="margin-left:auto;display:flex;gap:6px">${actions}</span></div>`:''}</div>`;
+S.bm_queue=()=>page(sidebar('bm','Review Queue'),`<div class="wrap" style="width:880px">${bmHead}
+ <div data-hit="queue">
+ ${comment('Instagram','Complaint','@alex','just now','The sole came off after one week. I want a refund, and nobody is answering!','Flagged','HIGH','Fri · 9:04 PM')}
+ ${comment('Facebook','Complaint','@customer','2 months ago','Issue with my product, bad service','Flagged','HIGH','Jun 11 · 6:11 PM')}
+ ${comment('Facebook','Complaint','@customer','1 month ago','I want a full refund of this product','Flagged','HIGH','Jul 2 · 1:25 PM')}
+ ${comment('Facebook','Feedback','@customer','3 months ago','Best shoes ever','Flagged','LOW','May 3 · 3:19 PM')}
+ </div></div>`,`<div class="card" data-hit="filtermenu" style="position:absolute;z-index:6;left:946px;top:206px;width:178px;padding:6px;border-radius:10px;box-shadow:0 14px 34px -12px rgba(0,0,0,.28);font-size:12px">
+ <div class="muted" style="font-size:10.5px;padding:4px 8px">Status</div>${['All','Review Needed','Flag'].map(s=>`<div style="padding:5px 8px;display:flex">${s}${s==='All'?`<span style="margin-left:auto">${I('check')}</span>`:''}</div>`).join('')}
+ <div style="border-top:1px solid #f0f0ef;margin:4px 0"></div><div data-hit="platform" style=""><div class="muted" style="font-size:10.5px;padding:4px 8px">Platform</div>${['All Platforms','Facebook','Instagram','LinkedIn','X (Twitter)'].map(s=>`<div ${s==='Instagram'?'data-hit="opt-instagram" ':''}style="padding:5px 8px;display:flex;border-radius:6px;${s==='Instagram'?'background:#f2f2f1':''}">${s}${s==='All Platforms'?`<span style="margin-left:auto">${I('check')}</span>`:''}</div>`).join('')}</div>
+ <div style="border-top:1px solid #f0f0ef;margin:4px 0"></div><div class="muted" style="font-size:10.5px;padding:4px 8px">Comment Category</div>${['All Categories','Product Enquiry','Feedback','Complaint','Praise'].map(s=>`<div style="padding:5px 8px;display:flex">${s}${s==='All Categories'?`<span style="margin-left:auto">${I('check')}</span>`:''}</div>`).join('')}</div>`);
+const draft=(txt,on)=>`<div style="margin:9px 0 0 28px;font-size:10.5px;color:#555"><span class="tag" style="height:18px">brand</span> <span style="margin-left:6px">Rule: ai_topic(['Broken Product', 'Refund']) → needs_review</span></div>
+ <div style="display:flex;gap:10px;margin:10px 0 0 28px"><span class="circ" style="background:#111;color:#fff;width:26px;height:26px">${I('spark')}</span><div class="card" ${on?'data-hit="draft"':''} style="flex:1;padding:10px 12px;background:#fcfcfb"><div style="display:flex;align-items:center;gap:7px;font-size:10.5px"><b>AI Draft</b><span class="tag" style="height:18px;font-weight:500">${I('msg')} Comment</span><span class="muted">· Comment reply on Instagram</span><span class="pill" style="margin-left:auto;background:#eaf2ff;color:#2563eb;border-radius:4px">Awaiting review</span></div>
+ <div style="background:#fff;border:1px solid #f0f0ef;border-radius:8px;padding:9px 10px;margin-top:8px;font-size:12px;line-height:1.5">${txt}</div>
+ <div style="display:flex;align-items:center;gap:6px;margin-top:9px"><span class="btn" ${on?'data-hit="approve"':''} style="background:#22a559;color:#fff;border-color:#22a559">${I('check')}Approve response</span><span class="btn" style="padding:0 7px">${I('refresh')}</span><span class="btn" style="padding:0 7px">${I('copy')}</span><span style="margin-left:auto;display:flex;gap:10px;color:#666">${I('thumb')}<span style="transform:scaleY(-1);display:inline-flex">${I('thumb')}</span></span></div></div></div>`;
+S.bm_reply=()=>page(sidebar('bm','Review Queue'),`<div class="wrap" style="width:880px">${bmHead}
+ ${comment('Instagram','Complaint','@alex','just now','The sole came off after one week. I want a refund, and nobody is answering!','Needs Review','HIGH','Fri · 9:04 PM',draft("Hi there, we're really sorry the sole gave way so soon. That's not the quality we stand for. Please DM us your order ID and we'll sort out your refund today.",true))}
+ ${comment('LinkedIn','Complaint','@customer','12 days ago',"We're still waiting on our order and refund. Can someone help?",'Needs Review','HIGH','Jul 30 · 12:24 PM',draft("Hi, we understand your concern and will prioritise this. Please DM your order ID and phone or email so we can register your case and share a prompt update.",false),false)}
+</div>`);
+S.bm_rule=()=>{
+  const box=(ic,lab,sub,body,h)=>`<div class="card" style="width:330px;padding:12px 14px;${h?'':''}"><div style="display:flex;align-items:center;gap:7px;font-size:11px"><span class="circ" style="width:22px;height:22px;background:#f4f4f3">${I(ic)}</span><b>${lab}</b><span class="muted">${sub}</span></div>${body}</div>`;
+  const line=`<div style="width:1px;height:22px;background:#d4d4d2;margin:0 auto"></div>`;
+  const chip=(t,on)=>`<span style="font-size:10.5px;padding:3px 8px;border-radius:10px;${on?'background:#111;color:#fff':'color:#444'}">${t}</span>`;
+  return page(sidebar('bm','Rules Engine'),`<div style="position:absolute;inset:0;background-image:radial-gradient(#e8e8e6 1px,transparent 1px);background-size:14px 14px"></div>
+ <div style="position:relative;padding:40px 0 0 40px;display:flex;align-items:center;gap:10px"><span class="circ" style="background:#f2f2f1">${I('cl')}</span><span style="font-size:18px;font-weight:600">Configure Rule</span><span class="pill" style="background:#f2f2f1;color:#555;margin-left:4px">Template · Negative Review Shield</span></div>
+ <div data-hit="rule" style="position:absolute;left:150px;top:96px;display:flex;flex-direction:column;align-items:center">
+  ${box('clock','WHEN','Trigger condition',`<div style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:11px"><span class="btn" style="flex:1;height:26px">Star Rating<span style="margin-left:auto">${I('cd')}</span></span><span class="muted">below</span><span class="btn" style="height:26px">2 ★ ${I('cd')}</span></div>`)}${line}
+  ${box('globe','ON','Channels',`<div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:9px">${chip('Facebook')}${chip('Instagram',1)}${chip('X')}${chip('YouTube')}${chip('Google',1)}${chip('LinkedIn')}${chip('App Store',1)}${chip('Play Store',1)}${chip('Reddit')}</div>`)}${line}
+  ${box('sliders','HOW','Action mode',`${[['Auto-respond','AI handles end-to-end, no human needed',1],['Needs Review','AI drafts, routes to review queue'],['Flag only','No response, flagged for manual handling']].map(([t,d,on])=>`<div style="display:flex;gap:8px;align-items:flex-start;margin-top:7px;padding:6px 8px;border-radius:8px;${on?'background:#f3faf5;border:1px solid #cdebd8':''}"><span style="width:12px;height:12px;border-radius:50%;border:${on?'4px solid #111':'1.5px solid #bbb'};margin-top:2px;flex:none"></span><div><div style="font-size:11.5px;font-weight:500">${t}</div><div class="muted" style="font-size:10px">${d}</div></div></div>`).join('')}`)}${line}
+  ${box('send','THEN','Actions',`${[['Reply in brand voice','#eaf7ef','#1f7a45'],['Send notification','#eaf2ff','#2563eb'],['Assign priority: HIGH','#fdecec','#c22f35']].map(([t,b,c])=>`<div style="margin-top:6px;padding:6px 9px;border-radius:7px;background:${b};color:${c};font-size:11px;display:flex">${t}<span style="margin-left:auto">×</span></div>`).join('')}`)}
+ </div>
+ <div class="card" style="position:absolute;left:590px;top:96px;width:270px;padding:14px 16px"><b style="font-size:12.5px">Rule Summary</b><div class="muted" style="font-size:10.5px">Draft · Not yet activated</div>
+  <div style="background:#f8f8f7;border-radius:9px;padding:10px 12px;margin-top:12px;font-size:11.5px;line-height:1.4">${[['WHEN','Star rating < 2'],['ON','Instagram, Google, App Store, Play Store'],['HOW','Auto-respond'],['THEN','Reply in brand voice, Send notification, Assign priority: high']].map(([a,b])=>`<div style="margin-bottom:9px"><div class="muted" style="font-size:9.5px;letter-spacing:.04em">${a}</div>${b}</div>`).join('')}</div>
+  <div style="text-align:center;margin-top:12px"><span class="btn dark" style="border-radius:16px;height:30px;padding:0 20px">Save &amp; Activate</span></div></div>`);
+};
+
+/* Consumer Insights */
+const ciHead=(tab)=>`<div style="display:flex;align-items:flex-start"><div><div class="h1">Social Intelligence</div><div class="muted" style="margin-top:3px">Track brand conversation, sentiment and share of voice across social &amp; video.</div></div><span style="margin-left:auto;display:flex;gap:6px"><span class="btn"><span class="muted">Date</span> Last 30 days</span><span class="btn">All Platforms</span><span class="btn">Export</span></span></div>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px">${[['TOPIC SPIKES','3','2 vs last month'],['EST. REACH','2.4M','18% vs last month'],['NET SENTIMENT','+32','6 pts vs last month'],['MENTIONS','11.5K','24% vs last month']].map(([a,b,c])=>`<div class="card" style="padding:12px 14px"><div class="muted" style="font-size:9.5px;letter-spacing:.05em">${a}</div><div style="font-size:22px;font-weight:600;margin-top:3px">${b}</div><div style="color:#1f9d55;font-size:10.5px;margin-top:3px">▲ ${c}</div></div>`).join('')}</div>
+<div style="display:flex;gap:4px;margin-top:14px">${['Share of Voice','Sentiment','Topics','Channels'].map(t=>`<span class="btn ${t===tab?'dark':''}" style="${t===tab?'':'border:none;background:none;color:#555'}">${t}</span>`).join('')}</div>`;
+S.ci_sov=()=>page(sidebar('ci','Social'),`<div class="wrap" style="width:900px">${ciHead('Share of Voice')}
+ <div class="card" data-hit="sov" style="margin-top:12px;padding:18px 20px;display:flex;gap:20px;height:250px">
+  <div style="width:200px"><b style="font-size:13px;font-weight:600">Your share of category conversation</b>
+   <div style="position:relative;width:150px;height:150px;margin:22px 0 0 14px"><svg width="150" height="150" viewBox="0 0 150 150"><circle cx="75" cy="75" r="62" fill="none" stroke="#eef0f5" stroke-width="18"/><circle cx="75" cy="75" r="62" fill="none" stroke="#3b5bfd" stroke-width="18" stroke-linecap="round" stroke-dasharray="${2*Math.PI*62*.24} 999" transform="rotate(-90 75 75)"/></svg><div style="position:absolute;inset:0;display:grid;place-items:center;text-align:center"><div><div style="font-size:30px;font-weight:700">24%</div><div class="muted" style="font-size:10px">of category voice</div></div></div></div></div>
+  <div style="width:170px;padding-top:56px"><div data-hit="rank"><div class="muted" style="font-size:9.5px;letter-spacing:.05em">CATEGORY RANK</div><div style="font-size:32px;font-weight:700;margin-top:2px"><span data-hit="rank2">#2</span> <span class="muted" style="font-size:13px;font-weight:400">of 6</span></div></div><div class="muted" style="font-size:9.5px;letter-spacing:.05em;margin-top:18px">VS PRIOR PERIOD</div><div style="font-size:22px;font-weight:600;color:#1f9d55">▲ +3.1 pts</div></div>
+  <div style="flex:1;padding-top:12px"><div class="muted" style="font-size:9.5px;letter-spacing:.05em;margin-bottom:6px">SHARE OF VOICE VS COMPETITORS</div>${[['Competitor A',31],['Your brand',24,1],['Competitor B',18],['Competitor C',12],['Others',15]].map(([t,v,me])=>`<div style="display:flex;align-items:center;gap:12px;height:34px;font-size:12px;${me?'font-weight:600':''}"><span style="width:90px">${t}</span><span style="flex:1;height:8px;border-radius:4px;background:#f0f0f3;position:relative"><span style="position:absolute;left:0;top:0;bottom:0;width:${v*2.6}%;border-radius:4px;background:${me?'#3b5bfd':'#c5c9d6'}"></span></span><span style="width:30px;text-align:right">${v}%</span></div>`).join('')}</div>
+ </div>
+ <div class="card" style="margin-top:12px;padding:11px 16px;font-size:12px;display:flex;gap:8px;align-items:center"><span style="color:#1f9d55">${I('check')}</span>You gained <b>3.1 pts</b> of voice this month, the biggest jump in your category.</div>
+</div>`);
+S.ci_sent=()=>page(sidebar('ci','Social'),`<div class="wrap" style="width:900px">${ciHead('Sentiment')}
+ <div class="card" style="margin-top:12px;padding:14px 18px"><div style="display:flex"><div><b style="font-weight:600;font-size:13px">Positive / neutral / negative split</b><div class="muted" style="font-size:10.5px;margin-top:2px">Share of all mentions by sentiment tone this period</div></div><span class="pill" style="margin-left:auto;background:#fdecec;color:#c22f35;height:22px;border:1px solid #f6c9c9;font-size:10.5px">▲ Negative up 6 pts this week · top driver: delivery delays</span></div>
+ <div style="display:flex;height:10px;border-radius:5px;overflow:hidden;margin-top:10px;gap:2px"><span style="width:54%;background:#22a559"></span><span style="width:31%;background:#c5c9d6"></span><span style="width:15%;background:#dc3c3c"></span></div>
+ <div style="display:flex;gap:16px;margin-top:8px;font-size:11px"><span><span class="dot" style="background:#22a559"></span> Positive <b>54%</b></span><span><span class="dot" style="background:#aab"></span> Neutral <b>31%</b></span><span><span class="dot" style="background:#dc3c3c"></span> Negative <b>15%</b></span></div></div>
+ <div style="display:flex;gap:12px;margin-top:12px">
+  <div class="card" style="flex:1.25;padding:14px 18px;height:250px"><b style="font-weight:600;font-size:13px">Sentiment trend</b><div class="muted" style="font-size:10.5px">Across all channels · last 30 days</div>
+   <svg width="100%" height="170" viewBox="0 0 460 170" preserveAspectRatio="none" style="margin-top:8px">${[30,70,110,150].map(y=>`<line x1="0" x2="460" y1="${y}" y2="${y}" stroke="#f0f0ef"/>`).join('')}<path d="M0 125 C80 120 150 100 230 90 S380 50 460 35" fill="none" stroke="#22a559" stroke-width="2.4"/><path d="M0 70 C80 80 160 95 230 105 S380 125 460 135" fill="none" stroke="#dc3c3c" stroke-width="2.4"/></svg>
+   <div style="font-size:10.5px;color:#666"><span class="dot" style="background:#22a559"></span> Positive &nbsp; <span class="dot" style="background:#dc3c3c"></span> Negative</div></div>
+  <div class="card" data-hit="bychannel" style="flex:1;padding:14px 18px;height:250px"><b style="font-weight:600;font-size:13px">Sentiment by channel</b><div class="muted" style="font-size:10.5px">Net sentiment score, −100 to +100</div>
+   ${[['Instagram',42,'linear-gradient(45deg,#f9ce34,#ee2a7b,#6228d7)','◎'],['YouTube',35,'#ff0000','▶'],['Google Play',28,'#0f9d58','▶'],['X',12,'#111','X'],['Reddit',-8,'#ff4500','r']].map(([t,v,bg,g])=>`<div style="display:flex;align-items:center;gap:10px;height:36px;font-size:12px"><span style="width:18px;height:18px;border-radius:5px;background:${bg};color:#fff;font-size:9px;display:grid;place-items:center;font-weight:700">${g}</span><span style="width:100px">${t}</span><span style="flex:1;position:relative;height:8px"><span style="position:absolute;${v>0?'left:20%':'right:80%'};width:${Math.abs(v)*1.8}%;top:0;bottom:0;border-radius:4px;background:${v>0?'#22a559':'#dc3c3c'}"></span></span><b style="width:30px;text-align:right;color:${v>0?'#1f9d55':'#dc3c3c'};font-weight:600">${v>0?'+':''}${v}</b></div>`).join('')}</div>
+ </div></div>`);
+
+/* AI Paid Media */
+const conn=(L,bg,t,d,state,hit)=>`<div class="card" ${hit?`data-hit="${hit}"`:''} style="padding:14px;height:118px;display:flex;flex-direction:column"><div style="display:flex;align-items:center;gap:10px"><span style="width:32px;height:32px;border-radius:8px;background:${bg};color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px">${L}</span><div><div style="font-weight:600;font-size:12.5px">${t}</div><div class="muted" style="font-size:10.5px">${d}</div></div></div>
+ <div style="margin-top:auto;display:flex;align-items:center">${state==='on'?`<span class="pill" style="background:#e9f8ef;color:#1f9d55;height:22px">${I('check')} Connected</span><span class="muted" style="margin-left:auto;font-size:10.5px">Synced 2 min ago</span>`:state==='new'?`<span class="pill" style="background:#e9f8ef;color:#1f9d55;height:22px">${I('check')} Connected</span><span class="muted" style="margin-left:auto;font-size:10.5px">Synced just now</span>`:`<span class="muted" style="font-size:11px">Not connected</span><span class="btn dark" ${hit?`data-hit="${hit}-btn"`:''} style="margin-left:auto;border-radius:14px">Connect</span>`}</div></div>`;
+const pmConn=(after)=>page(sidebar('pm','Connectors'),`<div class="wrap">
+ <div class="h1">Connectors</div><div class="muted" style="margin-top:3px;font-size:12.5px">Connect your ad platforms, analytics and attribution tools. AI Paid Media reads them all.</div>
+ <div style="display:flex;gap:12px;margin-top:14px;font-size:11px;color:#555"><span class="tag" style="height:24px">${after?'5':'4'} connected</span><span class="tag" style="height:24px">${after?'1':'2'} available</span></div>
+ <div style="display:flex;align-items:baseline;gap:6px;margin:18px 0 9px"><b style="font-weight:600;font-size:13px">Ad platforms</b><span class="muted" style="font-size:11px">Campaigns, spend and conversions</span></div>
+ <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">${conn('G','#4285f4','Google Ads','Search, PMax, Demand Gen, App','on')}${conn('M','#0866ff','Meta Ads','Facebook &amp; Instagram campaigns',after?'new':'off','meta')}</div>
+ <div style="display:flex;align-items:baseline;gap:6px;margin:18px 0 9px"><b style="font-weight:600;font-size:13px">Analytics &amp; attribution</b><span class="muted" style="font-size:11px">Sessions, installs and downstream events</span></div>
+ <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">${conn('GA','#f9ab00','Google Analytics 4','Sessions, landing pages, goals','on')}${conn('AF','#00c2a8','AppsFlyer','Installs and in-app events','on')}${conn('CT','#e2403a','CleverTap','Engagement and retention events','off')}</div>
+</div>`);
+S.pm_conn_before=()=>pmConn(false);
+S.pm_conn_after=()=>pmConn(true);
+const pmTop=(tab)=>`<div style="display:flex;align-items:flex-start"><div><div style="font-size:15px;font-weight:600">Overview</div><div class="muted" style="font-size:11px;margin-top:2px">Performance across <b style="color:#333">all platforms</b> · Last 30 days</div></div><span style="margin-left:auto;display:flex;gap:6px"><span class="btn">${I('sliders')}Customize ${I('cd')}</span><span class="btn">${I('download')}Export</span><span class="btn" style="padding:0 8px">${I('mail')}</span></span></div>
+<div style="display:flex;align-items:center;gap:10px;margin-top:12px;font-size:9.5px;color:#666;letter-spacing:.04em">PLATFORM <span style="display:flex;gap:2px;border:1px solid #ececea;border-radius:8px;padding:2px;background:#fff">${['All','Google','Meta'].map(t=>`<span style="padding:3px 8px;border-radius:6px;font-size:11px;letter-spacing:0;${t==='All'?'background:#111;color:#fff':'color:#444'}">${t}</span>`).join('')}</span><span style="margin-left:6px">${I('cal')} RANGE</span><span style="display:flex;gap:2px;border:1px solid #ececea;border-radius:8px;padding:2px;background:#fff">${['Today','Yesterday','7D','14D','30D','MTD','Custom'].map(t=>`<span style="padding:3px 8px;border-radius:6px;font-size:11px;letter-spacing:0;${t==='30D'?'background:#111;color:#fff':'color:#444'}">${t}</span>`).join('')}</span></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">${[['gauge','Performance snapshot','metrics · 5 priorities','5'],['drop','Funnel diagnosis','All platforms funnel']].map(([ic,t,d,n])=>`<div class="card" style="padding:10px 12px;display:flex;align-items:center;gap:10px;${t===tab?'border:1.5px solid #111':''}"><span class="circ" style="border-radius:8px;${t===tab?'background:#111;color:#fff':''}">${I(ic)}</span><div><div style="font-size:12px;font-weight:500">${t} ${n?`<span class="pill" style="background:#111;color:#fff;border-radius:50%;width:17px;padding:0;justify-content:center">${n}</span>`:''}</div><div class="muted" style="font-size:10.5px">${d}</div></div></div>`).join('')}</div>`;
+const signal=(pl,pri,type,t,d,foot,hit)=>{const pc={MEDIUM:'#c2410c',HIGH:'#dc2626',LOW:'#2563eb'}[pri];const tc={Opportunities:['#e9f8ef','#15803d','⊕'],Critical:['#fdecec','#c22f35','⚠'],Warning:['#fff4e0','#b45309','⚠']}[type];const bar={MEDIUM:'#f59e0b',HIGH:'#dc2626',LOW:'#3b82f6'}[pri];
+ return `<div class="card" ${hit?'data-hit="sig1"':''} style="padding:11px 14px;margin-top:8px;border-left:3px solid ${bar};position:relative"><div style="display:flex;gap:6px;align-items:center"><span class="tag" style="height:19px;font-weight:500">${pl}</span><span class="pill" style="color:${pc};background:#fff4ec">${pri}</span><span class="pill" style="background:${tc[0]};color:${tc[1]};border-radius:4px">${tc[2]} ${type}</span><span class="tag" style="height:19px">CAMPAIGN</span></div>
+ <div style="font-weight:600;font-size:12.5px;margin-top:7px">${t}</div><div class="muted" style="font-size:11px;margin-top:2px">${d}</div><div style="border-top:1px solid #f2f2f1;margin-top:9px;padding-top:7px;font-size:11px">${foot}</div>
+ <span class="btn dark" ${hit?`data-hit="${hit}"`:''} style="position:absolute;right:14px;top:12px;height:26px">${I('spark')}Analyse</span></div>`;};
+S.pm_overview=()=>page(sidebar('pm','Overview'),`<div class="wrap" style="width:880px;padding-top:50px">${pmTop('Performance snapshot')}
+ <div data-hit="snapshot" style="display:flex;gap:12px;margin-top:12px">
+  <div class="card" style="flex:1.45;padding:12px 16px"><div style="display:flex;align-items:center"><b style="font-weight:600;font-size:12.5px">Headline metrics</b><span class="muted" style="margin-left:auto;font-size:10.5px">Last updated: 11:30 AM ${I('refresh')}</span></div>
+   <div style="display:grid;grid-template-columns:1.1fr 1fr 1.2fr .6fr 1fr;font-size:9.5px;color:#777;letter-spacing:.04em;margin-top:10px;padding-bottom:6px;border-bottom:1px solid #f0f0ef"><span>METRIC</span><span>CURRENT</span><span>VS PREVIOUS PERIOD</span><span>TARGET</span><span>DIFFERENCE</span></div>
+   ${[['Spend','₹23.7L','₹21.14L','+12.12%','#dc2626','↗'],['ROAS','4.1','4.1','0%','#888','—'],['Leads','6.08K','5.43K','+12.13%','#16a34a','↗'],['Cost / lead','₹389.55','₹389.57','-0.01%','#888','—'],['CTR','2.7%','2.7%','0%','#888','—'],['Avg. CPC','₹7.87','₹7.87','0%','#888','—'],['Impressions','11.14M','9.94M','+12.12%','#16a34a','↗']].map(([a,b,c,d,col,ar])=>`<div style="display:grid;grid-template-columns:1.1fr 1fr 1.2fr .6fr 1fr;font-size:11.5px;padding:7.5px 0;border-bottom:1px solid #f6f6f5"><span>${a}</span><b style="font-weight:600">${b}</b><span class="muted">${c}</span><span class="muted">—</span><span style="color:${col};font-size:10.5px">${ar} ${d}</span></div>`).join('')}</div>
+  <div class="card" style="flex:1;padding:12px 16px"><div style="display:flex;align-items:center"><b style="font-weight:600;font-size:12.5px">Highlights</b><span class="muted" style="margin-left:auto;font-size:10.5px">Last updated: 11:30 AM</span></div>
+   <div style="display:flex;align-items:center;gap:6px;margin-top:8px;font-size:11.5px;font-weight:500">${I('spark')}Aurora Living</div>
+   ${[['WIN','#16a34a','#e9f8ef','ROAS held at 4.1 while spend grew 12% month on month.'],['WIN','#16a34a','#e9f8ef','6,084 leads this period, up 12% on the previous 30 days.'],['WATCH','#555','#f2f2f1','GA4 sessions (247,029) to lead is the softest step in the funnel this week.'],['RISK','#dc2626','#fdecec','AppsFlyer installs (83,990) on iOS are trending down and need creative support.'],['GOAL','#7c3aed','#f3edff','Pacing to ₹1.07Cr attributed revenue if the current trend holds.']].map(([k,c,bg,t])=>`<div style="display:flex;gap:9px;margin-top:9px"><span style="width:20px;height:20px;border-radius:50%;background:${bg};color:${c};display:grid;place-items:center;flex:none;font-size:10px">●</span><div><div style="font-size:9px;font-weight:700;color:${c};letter-spacing:.05em">${k}</div><div style="font-size:11px;line-height:1.4;color:#333">${t}</div></div></div>`).join('')}</div>
+ </div></div>`);
+S.pm_signals=()=>page(sidebar('pm','Overview'),`<div class="wrap" style="width:880px;padding-top:34px">
+ <div style="display:flex;align-items:center;gap:8px"><b style="font-size:14px;font-weight:600">Signals</b><span class="pill" style="background:#111;color:#fff;border-radius:50%;width:17px;padding:0;justify-content:center">5</span></div>
+ <div style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:11px;color:#666">Type <span style="display:flex;gap:2px;border:1px solid #ececea;border-radius:8px;padding:2px;background:#fff">${['All','Critical','Warning','Opportunities'].map(t=>`<span style="padding:3px 8px;border-radius:6px;${t==='All'?'background:#111;color:#fff':'color:#444'}">${t}</span>`).join('')}</span><span style="margin-left:8px">Priority</span><span style="display:flex;gap:2px;border:1px solid #ececea;border-radius:8px;padding:2px;background:#fff">${['Any','High','Medium','Low'].map(t=>`<span style="padding:3px 8px;border-radius:6px;${t==='Any'?'background:#111;color:#fff':'color:#444'}">${t}</span>`).join('')}</span><span style="margin-left:auto">Last updated: 11:30 AM</span></div>
+ <div data-hit="signals">
+ ${signal('Google','MEDIUM','Opportunities','Demand Gen is scaling efficiently','Demand Gen CPA is below target with volume still ramping.','<span class="muted" style="font-size:9.5px">ROAS</span> <b style="color:#16a34a">+0.78x</b> &nbsp; <span class="muted" style="font-size:9.5px">SPEND</span> <b>₹3.25L</b>','analyse1')}
+ ${signal('Meta','MEDIUM','Critical','Pixel events dropping after the checkout redesign','Purchase events fell 15% the day the new checkout shipped. Likely a pixel mapping gap.','Estimated impact: <b>₹6.93L est.</b>')}
+ ${signal('Google','HIGH','Warning','Impression share lost to budget on a top campaign','A top campaign is losing 22% impression share to budget caps during peak hours.','Estimated impact: <b>₹4.82L est.</b>')}
+ ${signal('Google','HIGH','Critical','Budget-capped on a top converting campaign','A top converting campaign is capped by budget during the highest-intent hours.','Estimated impact: <b>₹7.04L est.</b>')}
+ ${signal('Google','LOW','Warning','Impression share slipping on a secondary campaign','Impression share dipped 6% on a secondary accessories campaign with modest spend.','Estimated impact: <b>₹1.59L est.</b>')}
+ </div></div>`);
+S.pm_dash=()=>page(sidebar('rep','Dashboards'),`<div class="wrap" style="width:880px;padding-top:38px">
+ <div style="display:flex;align-items:center;gap:10px"><span class="circ" style="border-radius:8px">${I('grid')}</span><span style="font-size:17px;font-weight:600">Dashboards</span></div><div class="muted" style="margin-top:4px">Live metric cards across every AI module.</div>
+ <div style="display:flex;align-items:center;gap:8px;margin-top:14px"><span class="btn" style="border-radius:14px">★ Starred · 3</span><span class="btn" style="border-radius:14px;width:260px;color:#999">${I('search')}Search dashboards…</span><span class="btn dark" style="margin-left:auto;border-radius:14px">${I('plus')}New dashboard</span></div>
+ <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px">${[['Paid Search Funnel','Impression → click → lead funnel with drop-off analysis across campaigns and campaign types.','10 days'],['Brand Reputation','Consolidated brand perception: social comment sentiment and external review ratings.','10 days'],['Keyword &amp; Search Term Analysis','No description','22 days'],['Performance Dashboard','No description','22 days'],['Cross-Channel Marketing Dashboard','No description','22 days'],['Weekly Performance Review','No description','22 days'],['Creative Fatigue Tracker','No description','24 days']].map(([t,d,u])=>`<div class="card" style="padding:12px 14px;height:112px;display:flex;flex-direction:column"><div style="display:flex;align-items:center"><span class="pill" style="background:#e9f8ef;color:#15803d;border-radius:4px">DASHBOARD</span><span class="muted" style="margin-left:auto;font-size:10px">Updated ${u} ago</span></div><div style="font-weight:600;font-size:12.5px;margin-top:8px">${t}</div><div class="muted" style="font-size:10.5px;margin-top:3px;line-height:1.35;overflow:hidden;max-height:28px">${d}</div><div style="margin-top:auto;display:flex;gap:6px"><span class="btn" style="height:22px;font-size:10.5px">${I('send')}Share</span><span class="btn" style="height:22px;font-size:10.5px">${I('msg')}Open in chat</span></div></div>`).join('')}</div>
+</div>`,`<div class="scrim"></div>
+<div class="modal" data-hit="newdash" style="left:440px;top:170px;width:420px;padding:18px 18px 16px;background:#fff">
+ <div style="font-size:15px;font-weight:600">New dashboard</div><div class="muted" style="font-size:11.5px;margin-top:3px">Turn a plain-language brief into a live dashboard from your connected sources.</div>
+ <div style="font-size:11.5px;font-weight:500;margin-top:14px">Name of the dashboard</div><div style="border:1.5px solid #555;border-radius:9px;height:32px;margin-top:5px;padding:0 10px;display:flex;align-items:center;font-size:12px">Weekly lead-gen performance</div>
+ <div style="font-size:11.5px;font-weight:500;margin-top:12px">What should this dashboard contain?</div><div style="border:1px solid #e3e3e1;border-radius:9px;height:62px;margin-top:5px;padding:8px 10px;font-size:12px;line-height:1.45">Live cost per lead on Meta and Google, refreshed hourly, with a trend line and an anomaly flag when it moves more than 15%.</div>
+ <div class="muted" style="font-size:10px;margin-top:5px">${I('link')} Describe it in plain language. The AI assembles the dashboard from your connected sources.</div>
+ <div style="font-size:11.5px;font-weight:500;margin-top:12px">References (optional)</div><div style="display:flex;gap:6px;margin-top:5px"><span class="btn" style="height:24px;border-radius:12px">${I('attach')}Attach file</span><span class="btn" style="height:24px;border-radius:12px">${I('link')}Add link</span></div>
+ <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:10px"><span class="btn" style="border:none">Cancel</span><span class="btn dark" data-hit="create-dash" style="border-radius:14px">${I('plus')}Create dashboard</span></div>
+</div>`);
+
+const id=new URLSearchParams(location.search).get('s')||'home';
+document.getElementById('root').innerHTML=S[id]();
+const fm=document.querySelector('[data-hit=filtermenu]'),fb=document.querySelector('[data-hit=filters]');
+if(fm&&fb){const r=fb.getBoundingClientRect();fm.style.left=(r.left)+'px';fm.style.top=(r.bottom+6)+'px';}
+window.HITS=()=>{const o={};document.querySelectorAll('[data-hit]').forEach(e=>{const r=e.getBoundingClientRect();o[e.dataset.hit]=[r.x/12.8,r.y/7.2,r.width/12.8,r.height/7.2].map(v=>+v.toFixed(2));});return o;};
+</script></body></html>

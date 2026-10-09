@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brand OS Tour</title>
+<style>
+@font-face{font-family:"Figtree";src:url(data:font/woff2;base64,/*FONT*/) format("woff2");font-weight:300 900;font-display:block}
+:root{
+  --bg:#ffffff; --ink:#111216; --mute:#6b6e78; --line:#e7e7ea; --chip:#f3f3f5;
+  --blue:#2f6bff; --blue-soft:rgba(47,107,255,.16); --dim:rgba(12,14,22,.46);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:Figtree,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer}
+.tour{display:flex;flex-direction:column;align-items:center;gap:10px;padding:10px 12px 12px;height:100%;justify-content:center}
+.inner{width:100%;display:flex;flex-direction:column;gap:10px}
+
+/* top bar: product tabs + sound */
+.bar{display:flex;align-items:center;gap:8px;min-height:34px}
+.tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;flex:1;min-width:0}
+.tabs::-webkit-scrollbar{display:none}
+.tab{border:1px solid var(--line);background:#fff;border-radius:999px;height:32px;padding:0 13px;font-size:13px;font-weight:500;color:#3b3d45;white-space:nowrap;display:flex;align-items:center;gap:7px;transition:background .2s,color .2s,border-color .2s}
+.tab i{font-style:normal;font-size:11px;color:var(--mute);font-variant-numeric:tabular-nums}
+.tab.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.tab.on i{color:#b9bcc6}
+.icon{width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:#fff;display:grid;place-items:center;flex:none}
+.icon svg{width:16px;height:16px}
+
+/* stage */
+.stage{position:relative;width:100%;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#f6f6f5;box-shadow:0 0 0 1px rgba(0,0,0,.06),0 18px 50px -24px rgba(20,24,40,.35);user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.zoom{position:absolute;left:0;top:0;transform-origin:0 0}
+.zoom img{position:absolute;inset:0;width:100%;height:100%;display:block;transition:opacity .35s ease}
+.zoom img.back{opacity:0}
+svg.spot{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;transition:opacity .35s}
+.hl{position:absolute;border-radius:10px;pointer-events:none;box-shadow:0 0 0 2px rgba(255,255,255,.9);transition:opacity .3s}
+.hl.next{box-shadow:0 0 0 2.5px var(--blue),0 0 0 7px var(--blue-soft)}
+.ring{position:absolute;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;border:2.5px solid var(--blue);background:rgba(47,107,255,.10);cursor:pointer;opacity:0;transition:opacity .25s;pointer-events:none}
+.ring.on{opacity:1;pointer-events:auto;animation:pulse 1.6s ease-out infinite}
+.ring::after{content:"";position:absolute;inset:-2.5px;border-radius:50%;border:2.5px solid var(--blue);animation:wave 1.6s ease-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(.88)}}
+@keyframes wave{0%{transform:scale(1);opacity:.75}100%{transform:scale(1.9);opacity:0}}
+.cursor{position:absolute;width:26px;height:26px;margin:-3px 0 0 -4px;pointer-events:none;filter:drop-shadow(0 3px 5px rgba(0,0,0,.28));opacity:0;transition:opacity .3s}
+.cursor.on{opacity:1}
+.chip{position:absolute;height:30px;padding:0 12px;border-radius:999px;background:var(--blue);color:#fff;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;white-space:nowrap;box-shadow:0 8px 20px -8px rgba(47,107,255,.7);opacity:0;transform:translateY(4px);transition:opacity .3s,transform .3s;pointer-events:none;border:0}
+.chip.on{opacity:1;transform:none;pointer-events:auto}
+
+/* caption */
+.cap{position:absolute;width:300px;background:#fff;border-radius:14px;padding:14px 16px 13px;box-shadow:0 0 0 1px rgba(0,0,0,.05),0 18px 40px -18px rgba(10,14,30,.45);transition:left .5s ease,top .5s ease,opacity .3s;opacity:0}
+.cap.on{opacity:1}
+.cap .k{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--blue);display:flex;gap:8px}
+.cap .k span{color:var(--mute);font-weight:500}
+.cap h3{margin:6px 0 5px;font-size:17px;line-height:1.25;font-weight:650;letter-spacing:-.01em}
+.cap p{margin:0;font-size:13.5px;line-height:1.45;color:#3d4049}
+.below{display:none;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.below .k{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--blue)}
+.below h3{margin:5px 0 4px;font-size:16px;font-weight:650}
+.below p{margin:0;font-size:13.5px;line-height:1.45;color:#3d4049}
+
+/* controls */
+.ctrl{display:flex;align-items:center;gap:10px}
+.prog{flex:1;height:4px;border-radius:2px;background:#ececef;overflow:hidden}
+.prog b{display:block;height:100%;width:0;background:var(--ink);border-radius:2px;transition:width .4s ease}
+.count{font-size:12.5px;color:var(--mute);font-variant-numeric:tabular-nums;min-width:42px;text-align:center}
+.nb{height:34px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:6px}
+.nb.go{background:var(--ink);color:#fff;border-color:var(--ink)}
+.nb:disabled{opacity:.4;cursor:default}
+.nb svg{width:15px;height:15px}
+
+/* start + end */
+.over{position:absolute;inset:0;display:none}
+.over.show{display:block}
+.start{background:rgba(255,255,255,.08)}
+.startbtn{position:absolute;transform:translate(-50%,-50%);height:46px;padding:0 22px 0 18px;border-radius:999px;border:0;background:var(--ink);color:#fff;font-size:15.5px;font-weight:600;display:flex;align-items:center;gap:10px;box-shadow:0 14px 30px -12px rgba(0,0,0,.55),0 0 0 6px rgba(17,18,22,.08);white-space:nowrap;animation:bob 2.4s ease-in-out infinite}
+.startbtn svg{width:16px;height:16px}
+@keyframes bob{0%,100%{box-shadow:0 14px 30px -12px rgba(0,0,0,.55),0 0 0 6px rgba(17,18,22,.08)}50%{box-shadow:0 14px 30px -12px rgba(0,0,0,.55),0 0 0 11px rgba(17,18,22,.05)}}
+.end{background:radial-gradient(120% 90% at 50% 0%,rgba(47,107,255,.22),transparent 60%),rgba(10,12,20,.78);color:#fff;display:none;place-items:center;text-align:center}
+.end.show{display:grid}
+.end .logo{width:44px;height:44px;margin:0 auto 14px}
+.end h2{margin:0;font-size:clamp(26px,4.4vw,46px);letter-spacing:-.02em;font-weight:700}
+.end p{margin:10px auto 22px;max-width:30em;font-size:clamp(13.5px,1.5vw,17px);line-height:1.5;color:#d6d8e0;padding:0 18px}
+.end button{height:42px;padding:0 20px;border-radius:999px;border:0;background:#fff;color:var(--ink);font-weight:600;font-size:14.5px;display:inline-flex;align-items:center;gap:8px}
+.end button svg{width:16px;height:16px}
+
+/* narrow stage */
+.narrow .cap{display:none}
+.narrow.run .below{display:block}
+.mid .cap{padding:11px 13px 10px}.mid .cap h3{font-size:15px;margin:4px 0 3px}.mid .cap p{font-size:12.5px;line-height:1.4}
+.narrow .tab{height:28px;font-size:12px;padding:0 10px}
+.narrow .tab i{display:none}
+.narrow .chip{height:24px;font-size:11px;padding:0 9px}
+.narrow .ring{width:34px;height:34px;margin:-17px 0 0 -17px}
+.narrow .startbtn{left:50%!important;top:50%!important;height:44px;font-size:15px}
+.narrow .start{background:rgba(10,12,20,.35)}
+.narrow .end p{display:none}
+.narrow .end .logo{width:34px;height:34px;margin-bottom:10px}
+.narrow .nb .t{display:none}
+.narrow .nb{padding:0 11px}
+</style>
+</head>
+<body>
+<div class="tour" id="tour">
+ <div class="inner" id="inner">
+  <div class="bar">
+    <div class="tabs" id="tabs" role="tablist" aria-label="Products"></div>
+    <button class="icon" id="snd" aria-label="Sound on"></button>
+  </div>
+  <div class="stage" id="stage">
+    <div class="zoom" id="zoom"><img id="imA" alt=""><img id="imB" class="back" alt=""></div>
+    <svg class="spot" id="spot" style="opacity:0"><defs><mask id="m"><rect width="100%" height="100%" fill="#fff"/><g id="holes"></g></mask></defs><rect id="dimr" width="100%" height="100%" fill="rgba(12,14,22,.46)" mask="url(#m)"/></svg>
+    <div id="hls"></div>
+    <div class="ring" id="ring" role="button" aria-label="Next step" tabindex="0"></div>
+    <button class="chip" id="chip"></button>
+    <div class="cursor" id="cur"><svg viewBox="0 0 26 26" width="26" height="26"><path d="M4 2.5l17 10-7.4 1.7-3.8 7.1z" fill="#2f6bff" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+    <div class="cap" id="cap" aria-live="polite"><div class="k"><b id="capC"></b><span id="capN"></span></div><h3 id="capT"></h3><p id="capD"></p></div>
+    <div class="over start show" id="start"><button class="startbtn" id="startBtn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l12.5-7.5z"/></svg>Take an interactive Tour</button></div>
+    <div class="over end" id="end"><div><div class="logo">/*LOGO*/</div><h2>That's Brand OS</h2><p>One brand brain behind every agent: creative, moderation, insights and paid media, working from the same knowledge of your brand.</p><button id="replay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 2.6-6.4L3 8 M3 3v5h5"/></svg>Replay</button></div></div>
+  </div>
+  <div class="below" id="below" aria-live="polite"><div class="k" id="belC"></div><h3 id="belT"></h3><p id="belD"></p></div>
+  <div class="ctrl">
+    <button class="nb" id="prev" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg><span class="t">Back</span></button>
+    <div class="prog"><b id="bar"></b></div>
+    <span class="count" id="count"></span>
+    <button class="nb go" id="next" aria-label="Next"><span class="t">Next</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+  </div>
+ </div>
+</div>
+<script>
+/* ===== Settings ===== */
+const CONFIG = {
+  voice: "browser",        // "browser" = device text-to-speech (placeholder) · "files" = audio/00.mp3 … audio/18.mp3 · "off"
+  voiceLang: "en-US",
+  voiceRate: 1.0,
+  beatDelay: 2600,         // ms before a transition step zooms out to show the next product
+  intro: "Here's a quick tour of Brand OS: five AI products that share one brain about your brand."
+};
+/* Steps. Coordinates are % of the 2560×1440 frame, measured from the rendered screens.
+   p = click point, a = area the step explains, h = next product's sidebar item (transition steps), z = max zoom */
+const STEPS = /*STEPS*/;
+const CHAPTERS = ["Brand Brain","Creative AI","Brand Moderator","Consumer Insights","AI Paid Media"];
+const IMG = /*IMG*/;
+const START_IMG = "home", START_AT = /*STARTAT*/;
+
+const $ = id => document.getElementById(id);
+const tour=$('tour'), inner=$('inner'), stage=$('stage'), zoom=$('zoom'), holes=$('holes'), hls=$('hls'), ring=$('ring'), chip=$('chip'), cur=$('cur'), cap=$('cap');
+const imgs=[$('imA'),$('imB')]; let front=0;
+let W=0,H=0, i=-1, beat=0, timers=[], started=false, sound=true, ended=false;
+let view={s:1,tx:0,ty:0}, curPt=[50,50], anim=0, scene={rects:[],ring:null,chip:null};
+const ICON={on:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z M16 9a4 4 0 0 1 0 6 M19 6a8 8 0 0 1 0 12"/></svg>',off:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z M17 9l5 6 M22 9l-5 6"/></svg>'};
+
+/* preload */
+Object.values(IMG).forEach(u=>{const im=new Image(); im.src=u;});
+imgs[0].src = IMG[START_IMG];
+
+/* tabs */
+$('tabs').innerHTML = CHAPTERS.map((c,k)=>`<button class="tab" role="tab" data-c="${c}"><i>${k+1}</i>${c}</button>`).join('');
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{ if(!started) begin(false); go(STEPS.findIndex(s=>s.c===b.dataset.c)); });
+
+/* sizing: fit the stage to the frame we live in (iframe-friendly) */
+function size(){
+  const vw = tour.clientWidth - 24, vh = window.innerHeight - 24;
+  const chrome = 34 + 34 + 20 + (vw < 720 ? 110 : 0);
+  const w = Math.max(260, Math.min(vw, (vh - chrome) * 16/9));
+  inner.style.width = w + 'px';
+  W = stage.clientWidth; H = stage.clientHeight;
+  zoom.style.width = W + 'px'; zoom.style.height = H + 'px';
+  tour.classList.toggle('narrow', W < 720); tour.classList.toggle('mid', W >= 720 && W < 1000);
+  cap.style.width = Math.round(Math.min(320, Math.max(230, W*0.25))) + 'px';
+  if (i >= 0 && !ended) { const t = target(); view = t.v; curPt = t.pt; render(1); placeCap(); }
+  placeStart();
+}
+window.addEventListener('resize', size);
+
+/* geometry */
+const P = (x,y) => [x/100*W*view.s + view.tx, y/100*H*view.s + view.ty];
+const R = r => { const [x,y]=P(r[0],r[1]); return [x,y,r[2]/100*W*view.s,r[3]/100*H*view.s]; };
+const union = (a,b) => { const x=Math.min(a[0],b[0]), y=Math.min(a[1],b[1]); return [x,y,Math.max(a[0]+a[2],b[0]+b[2])-x,Math.max(a[1]+a[3],b[1]+b[3])-y]; };
+function fit(r, zmax){
+  const pad = W < 720 ? 0.94 : 0.86;
+  let s = Math.min(zmax, W*pad/(r[2]/100*W), H*pad/(r[3]/100*H)); s = Math.max(1, s);
+  const cx = (r[0]+r[2]/2)/100*W, cy = (r[1]+r[3]/2)/100*H;
+  let tx = W/2 - cx*s, ty = H/2 - cy*s;
+  tx = Math.min(0, Math.max(W - W*s, tx)); ty = Math.min(0, Math.max(H - H*s, ty));
+  return {s,tx,ty};
+}
+function target(){
+  const s = STEPS[i];
+  if (s.h && beat === 1) return {v: fit(union(s.a, s.h), 1.25), pt: s.hp};
+  return {v: fit(s.a, (s.z || 1.6) * (W < 720 ? 1.5 : 1)), pt: s.p};
+}
+
+/* drawing */
+function render(){
+  zoom.style.transform = `translate(${view.tx}px,${view.ty}px) scale(${view.s})`;
+  const pad = 6;
+  holes.innerHTML = scene.rects.map(o=>{const [x,y,w,h]=R(o.r); return `<rect x="${x-pad}" y="${y-pad}" width="${w+2*pad}" height="${h+2*pad}" rx="10" fill="#000"/>`;}).join('');
+  const els = hls.children;
+  scene.rects.forEach((o,k)=>{ const [x,y,w,h]=R(o.r), e=els[k]; if(!e) return; e.style.left=(x-pad)+'px'; e.style.top=(y-pad)+'px'; e.style.width=(w+2*pad)+'px'; e.style.height=(h+2*pad)+'px'; });
+  const [cx,cy] = P(curPt[0],curPt[1]); cur.style.left = cx+'px'; cur.style.top = cy+'px';
+  if (scene.ring){ const [rx,ry]=P(scene.ring[0],scene.ring[1]); ring.style.left=rx+'px'; ring.style.top=ry+'px'; }
+  if (scene.chip){ const [x,y,w,h]=R(scene.chip); const cw = chip.offsetWidth||140; let left = x+w+14, top = y+h/2-15;
+    if (left + cw > W - 8) left = Math.max(8, x - cw - 14); chip.style.left=left+'px'; chip.style.top=Math.max(8,Math.min(H-38,top))+'px'; }
+}
+const ease = t => t<.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2;
+function animateTo(t, dur=900){
+  cancelAnimationFrame(anim);
+  const v0 = {...view}, p0 = [...curPt], t0 = performance.now();
+  const step = now => {
+    const k = Math.min(1, (now - t0)/dur), e = ease(k);
+    view = {s: v0.s+(t.v.s-v0.s)*e, tx: v0.tx+(t.v.tx-v0.tx)*e, ty: v0.ty+(t.v.ty-v0.ty)*e};
+    curPt = [p0[0]+(t.pt[0]-p0[0])*e, p0[1]+(t.pt[1]-p0[1])*e];
+    render(); if (k < 1) anim = requestAnimationFrame(step);
+  };
+  anim = requestAnimationFrame(step);
+}
+function setScene(rects, ringPt, chipRect, chipText){
+  scene = {rects, ring: ringPt, chip: chipRect};
+  hls.innerHTML = rects.map(o=>`<div class="hl ${o.next?'next':''}"></div>`).join('');
+  ring.classList.toggle('on', !!ringPt);
+  chip.classList.toggle('on', !!chipRect);
+  if (chipText) chip.innerHTML = `Next: ${chipText} <span aria-hidden="true">→</span>`;
+}
+
+/* caption: in a corner of the stage that stays clear of the highlight and the cursor */
+function placeCap(){
+  const s = STEPS[i]; if (!s || W < 720) return;
+  const t = target(), keep = view; view = t.v;
+  const boxes = scene.rects.map(o=>R(o.r)); const [px,py]=P(t.pt[0],t.pt[1]); boxes.push([px-30,py-30,60,60]);
+  view = keep;
+  const cw = cap.offsetWidth, ch = cap.offsetHeight, m = 14;
+  const spots = [[W-cw-m,H-ch-m],[m,H-ch-m],[W-cw-m,m],[m+0,m+0],[W-cw-m,(H-ch)/2]];
+  const ov = ([x,y]) => boxes.reduce((a,[bx,by,bw,bh]) => a + Math.max(0,Math.min(x+cw,bx+bw)-Math.max(x,bx))*Math.max(0,Math.min(y+ch,by+bh)-Math.max(y,by)), 0);
+  let best = spots[0], bo = Infinity; spots.forEach(p=>{ const o = ov(p); if (o < bo - 1) { bo = o; best = p; } });
+  cap.style.left = best[0]+'px'; cap.style.top = best[1]+'px';
+}
+
+/* steps */
+function showImg(id){
+  const url = IMG[id]; if (imgs[front].getAttribute('src') === url) return;
+  const nx = imgs[1-front]; nx.src = url;
+  const swap = () => { nx.classList.remove('back'); imgs[front].classList.add('back'); front = 1-front; };
+  (nx.decode ? nx.decode() : Promise.resolve()).then(swap, swap);
+}
+const later = (f,ms) => timers.push(setTimeout(f,ms));
+function go(n){
+  if (n < 0) return;
+  timers.forEach(clearTimeout); timers = []; stopVoice();
+  if (n >= STEPS.length) return finish();
+  ended = false; $('end').classList.remove('show'); $('start').classList.remove('show');
+  i = n; beat = 0; const s = STEPS[i];
+  showImg(s.img);
+  setScene([{r:s.a}], s.h ? null : s.p, null);
+  cur.classList.add('on'); hls.style.opacity = 1; $('spot').style.opacity = 1;
+  animateTo(target());
+  if (s.h) later(() => { beat = 1; setScene([{r:s.a},{r:s.h,next:true}], s.hp, s.h, s.next); animateTo(target(), 1100); placeCap(); }, CONFIG.beatDelay);
+  const k = CHAPTERS.indexOf(s.c);
+  $('capC').textContent = s.c; $('capN').textContent = `${i+1} / ${STEPS.length}`; $('capT').textContent = s.t; $('capD').textContent = s.d;
+  $('belC').textContent = `${s.c} · ${i+1} / ${STEPS.length}`; $('belT').textContent = s.t; $('belD').textContent = s.d;
+  cap.classList.add('on'); placeCap();
+  document.querySelectorAll('.tab').forEach((b,j)=>{ b.classList.toggle('on', j===k); b.setAttribute('aria-selected', j===k); });
+  const on = document.querySelector('.tab.on'); if (on) on.scrollIntoView({block:'nearest', inline:'nearest'});
+  $('bar').style.width = ((i+1)/STEPS.length*100)+'%';
+  $('count').textContent = `${i+1} / ${STEPS.length}`;
+  $('prev').disabled = i <= 0; $('next').disabled = false;
+  speak(i);
+}
+function finish(){
+  timers.forEach(clearTimeout); timers=[]; stopVoice(); ended = true; i = STEPS.length;
+  setScene([], null, null); cur.classList.remove('on'); cap.classList.remove('on'); $('spot').style.opacity = 0;
+  animateTo({v:{s:1,tx:0,ty:0}, pt:curPt}, 700);
+  $('end').classList.add('show');
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
+  $('bar').style.width='100%'; $('count').textContent = 'Done'; $('next').disabled = true; $('prev').disabled = false;
+  $('belC').textContent = ''; $('belT').textContent = "That's Brand OS"; $('belD').textContent = 'Press Replay to watch again.';
+}
+function begin(withIntro){ started = true; tour.classList.add('run'); $('start').classList.remove('show'); unlockVoice(); introPending = withIntro; }
+let introPending = false;
+
+/* voice */
+let audio = null;
+function unlockVoice(){ if (CONFIG.voice === 'files' && !audio) audio = new Audio(); if (CONFIG.voice === 'browser' && 'speechSynthesis' in window) speechSynthesis.cancel(); }
+function stopVoice(){ if ('speechSynthesis' in window) speechSynthesis.cancel(); if (audio) { audio.pause(); audio.onended = null; } }
+function pickVoice(){ const vs = speechSynthesis.getVoices(); return vs.find(v=>v.lang===CONFIG.voiceLang && /natural|google|samantha|aria|jenny/i.test(v.name)) || vs.find(v=>v.lang===CONFIG.voiceLang) || vs.find(v=>/^en/.test(v.lang)); }
+function speak(n){
+  if (!started || !sound || CONFIG.voice === 'off') return;
+  const withIntro = introPending; introPending = false;
+  if (CONFIG.voice === 'files') {
+    const play = (k, then) => { audio.src = `audio/${String(k).padStart(2,'0')}.mp3`; audio.onended = then || null; audio.play().catch(()=>{}); };
+    if (withIntro) play(0, () => { if (i === n) play(n+1); }); else play(n+1);
+    return;
+  }
+  if (!('speechSynthesis' in window)) return;
+  const say = txt => { const u = new SpeechSynthesisUtterance(txt); const v = pickVoice(); if (v) u.voice = v; u.lang = CONFIG.voiceLang; u.rate = CONFIG.voiceRate; speechSynthesis.speak(u); };
+  if (withIntro) say(CONFIG.intro);
+  say(STEPS[n].v || (STEPS[n].t + '. ' + STEPS[n].d));
+}
+function setSound(on){ sound = on; $('snd').innerHTML = ICON[on?'on':'off']; $('snd').setAttribute('aria-label', on ? 'Sound on' : 'Sound off'); if (!on) stopVoice(); else if (started && !ended && i>=0) speak(i); }
+
+/* start screen button sits between the prompt box and the cards on the home screen */
+function placeStart(){ const b = $('startBtn'); b.style.left = START_AT[0]+'%'; b.style.top = START_AT[1]+'%'; }
+
+/* input */
+const nextStep = () => { if (!started) { begin(true); go(0); return; } if (ended) return; go(i+1); };
+$('startBtn').onclick = e => { e.stopPropagation(); begin(true); go(0); };
+$('next').onclick = nextStep;
+$('prev').onclick = () => { if (!started) return; if (ended) return go(STEPS.length-1); go(i-1); };
+ring.onclick = nextStep; ring.onkeydown = e => { if (e.key==='Enter'||e.key===' ') { e.preventDefault(); nextStep(); } };
+chip.onclick = nextStep;
+$('replay').onclick = () => { go(0); };
+$('snd').onclick = () => setSound(!sound);
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') { e.preventDefault(); nextStep(); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); $('prev').onclick(); }
+});
+window.BrandOSTour = { go, get step(){ return i; }, get beat(){ return beat; }, showBeat2(){ const s=STEPS[i]; if(s&&s.h){ timers.forEach(clearTimeout); timers=[]; beat=1; setScene([{r:s.a},{r:s.h,next:true}], s.hp, s.h, s.next); view=target().v; curPt=target().pt; render(); placeCap(); } }, settle(){ cancelAnimationFrame(anim); const t=target(); view=t.v; curPt=t.pt; render(); placeCap(); } };
+setSound(true); $('prev').disabled = true; $('count').textContent = `0 / ${STEPS.length}`;
+size(); requestAnimationFrame(size);
+</script>
+</body></html>
