@@ -109,3 +109,42 @@ if cleanup:
     sheet(wb, 'Existing TAM Cleanup', cleanup['header'], cleanup['rows'], {h: 40 for h in cleanup['header']})
 wb.save(OUT)
 print('saved', OUT, len(Q), 'qualified', len(R), 'rejected')
+
+# ---- Extra tabs: Probable (unverified) and Near-miss
+import re as _re, importlib as _il
+from openpyxl import load_workbook as _lw
+import merge as _m
+from govt import is_govt as _gv
+_wb = _lw(OUT)
+_Qn = {_m.nm(r['company_name']) for r in Q}
+def _clean(r):
+    if _m.nm(r.get('company_name')) in _Qn: return False
+    if _gv(r) or _m.group_match(r): return False
+    if _re.search(r'already|group|duplicate|b2b|not consumer|government|foreign|prescription|liquidat|defunct|closed|insolv|trust|ngo|subsidiary|holding', r.get('final_reason',''), _re.I): return False
+    k, s = _m.seen_match(r)
+    return k != 'strong'
+_seen = set(); P = []; N = []
+for r in R:
+    key = _m.nm(r.get('company_name'))
+    if key in _seen or not _clean(r): continue
+    rv = r.get('revenue_inr_cr')
+    if rv and 300 <= rv < 500: N.append(r); _seen.add(key)
+    elif _re.search(r'unverif|not found|no fy|needs verification|not verifiable|mca|old|fy2[0-3]', r.get('final_reason',''), _re.I) and (not rv or rv >= 500):
+        P.append(r); _seen.add(key)
+def _tab(title, rows, note):
+    ws = _wb.create_sheet(title)
+    ws.append([note]); ws['A1'].font = Font(bold=True, color='B91C1C')
+    hdr = ['Company Name', 'Main Industry', 'Sub-industry', 'Website', 'Parent Group', 'Last known revenue (₹ Cr)', 'Year of figure', 'Why not in main list', 'Source (if any)']
+    ws.append(hdr)
+    for c in ws[2]: c.fill = HDR_FILL; c.font = HDR_FONT
+    for r in sorted(rows, key=lambda r: (r.get('industry') or '', r.get('company_name') or '')):
+        ws.append([r.get('company_name'), r.get('industry'), r.get('sub_industry'), r.get('website'), r.get('parent_group'), (r.get('revenue_inr_cr') or None), r.get('revenue_fy'), r.get('final_reason'), r.get('revenue_source_url')])
+    for i, w in enumerate([38, 26, 30, 30, 26, 14, 10, 60, 40], 1): ws.column_dimensions[get_column_letter(i)].width = w
+    ws.freeze_panes = 'B3'; ws.auto_filter.ref = f"A2:I{ws.max_row}"
+_tab('Probable (unverified rev)', P, f'{len(P)} companies that fit the ICP on profile but have NO public FY24+ revenue figure (private cos that do not publish). Not counted in the main list — verify on MCA/Tofler before outreach.')
+_tab('Near-miss ₹300-499 Cr', N, f'{len(N)} ICP-fit companies with verified revenue between ₹300 and ₹499 Cr — just under the bar. Not counted in the main list.')
+for _t in ('Probable (unverified rev)', 'Near-miss ₹300-499 Cr'):
+    _cur = _wb.sheetnames.index(_t); _tgt = _wb.sheetnames.index('Rejected (audit)')
+    _wb.move_sheet(_t, offset=_tgt - _cur)
+_wb.save(OUT)
+print('extra tabs: probable', len(P), 'near-miss', len(N))
