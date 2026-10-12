@@ -8,7 +8,10 @@ from rapidfuzz import fuzz
 USD_RATE = 85.0
 GENERIC_DOMAINS = {'', 'linkedin.com', 'facebook.com', 'not found', 'google.com', 'wikipedia.org'}
 
-seen = json.load(open('seen_index.json'))
+_all = json.load(open('seen_index.json'))
+seen = [x for x in _all if x['source'] != 'APOLLO']
+APOLLO_DOM = {x['domain'] for x in _all if x['source'] == 'APOLLO' and x['domain']}
+APOLLO_NM = {x['norm'] for x in _all if x['source'] == 'APOLLO' and x['norm']}
 HARD = {'CLIENT_META', 'PIPELINE', 'ACCOUNT_LIST', 'ACTIVE_CONN', 'WIKI_CUSTOMER', 'WIKI_ACTIVE_PROSPECT', 'WIKI_EXPLORING'}
 by_dom = collections.defaultdict(list); by_li = collections.defaultdict(list); by_nm = collections.defaultdict(list)
 for s in seen:
@@ -84,6 +87,8 @@ LEAD = [  # (industry, sub-industry regex, lead module, secondary, priority weig
  ('Hospitality', r'.', 'Consumer AI (reviews & ORM)', 'Paid Media AI', 1),
  ('Airlines & Aviation', r'.', 'Consumer AI (Brand Moderator)', 'Creative AI', 1),
  ('Home improvement', r'.', 'Creative AI (dealer & retail creative)', 'Paid Media AI', 1),
+ ('Media, Entertainment & Consumer Internet', r'.', 'Paid Media AI + Consumer AI', 'Creative AI', 2),
+ ('Education', r'.', 'Paid Media AI + Reporting (lead funnel)', 'Creative AI', 1),
 ]
 
 def lead(ind, sub):
@@ -127,6 +132,10 @@ def main():
         elif not (r.get('revenue_source_url') or '').startswith('http'):
             r['final_status'] = 'Rejected'; r['final_reason'] = 'No revenue source URL'
         if not r['final_status']:
+            from govt import is_govt
+            if is_govt(r):
+                r['final_status'] = 'Rejected'; r['final_reason'] = 'Government / PSU / non-profit entity (user rule: excluded)'
+        if not r['final_status']:
             g = group_match(r)
             if g:
                 r['final_status'] = 'Rejected'; r['final_reason'] = f'Group excluded: {g[0]} (trigger: {g[1]}; matched "{g[2]}")'
@@ -162,6 +171,8 @@ def main():
             r['final_status'] = 'Qualified'
             a, b, _ = lead(r.get('industry'), r.get('sub_industry'))
             r['lead_module'] = a; r['expansion_module'] = b; r['fit_score'] = score(r)
+            d = dom(r.get('website')); n = nm(r.get('company_name'))
+            r['source_tag'] = 'Apollo export – re-qualified (was dropped from TAM)' if (d and d in APOLLO_DOM) or n in APOLLO_NM or r.get('_from_apollo') else 'New – not in Apollo export'
             r['revenue_usd'] = round(r['revenue_inr_cr'] * 1e7 / USD_RATE)
     json.dump(out, open('merged.json', 'w'), ensure_ascii=False, indent=0)
     c = collections.Counter(r['final_status'] for r in out)

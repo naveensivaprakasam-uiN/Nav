@@ -1,0 +1,8 @@
+import re
+GOVT_OWN=re.compile(r'PSU|Govt|Government|State-owned|Public sector|Trust|Not[- ]for[- ]profit|NGO|Society',re.I)
+GOVT_NAME=re.compile(r"""(\bbank of (maharashtra|india|baroda)\b|indian overseas bank|punjab (&|and) sind|\buco bank|central bank of india|union bank of india|canara bank|\bindian bank\b|state bank|\bidbi bank|india post|united india insurance|national insurance|oriental insurance|new india assurance|\bgic\b|life insurance corporation|airports authority|alliance air|hll lifecare|karnataka soaps|\birctc|indian railway|gr[aā]m[ie]e?n[a]? bank|grameena|state co-?operative|co-?operative (apex )?bank (ltd )?\(apcob\)|apex co-?op|\bapcob\b|federation|milk producers'? federation|milkfed|\bkmf\b|\baavin\b|\bmilma\b|\bomfed\b|\brcdf\b|comfed|tgddcf|vijaya dairy|indian oil|hindustan petroleum|bharat petroleum|\bmtnl\b|\bbsnl\b|railtel|\bksfe\b|kerala state financial|transport corporation|metro rail|\btrust\b|foundation|\bsociety\b|sir ganga ram|aravind eye|sankara nethralaya|l ?v prasad|\blvpei\b|tamil nadu newsprint|national dairy development|ntpc|\bongc\b|coal india|gail|power grid|mysore sales|kerala bank)""",re.I)
+def is_govt(r):
+    if re.search(r'REIT|InvIT|Select Trust|Embassy Office Parks|Mindspace Business Parks|Brookfield India',str(r.get('company_name') or ''),re.I): return False
+    own=str(r.get('ownership') or '')+' '+str(r.get('parent_group') or '')
+    if re.search(r'PSU|Govt|Government|State-owned|Trust|Not[- ]for[- ]profit|NGO',own,re.I): return True
+    return bool(GOVT_NAME.search(str(r.get('company_name') or '')+' '+str(r.get('brand_name') or '')))

@@ -11,11 +11,11 @@ cleanup = json.load(open('tam_cleanup.json')) if __import__('os').path.exists('t
 Q = [r for r in rows if r['final_status'] == 'Qualified']
 R = [r for r in rows if r['final_status'] == 'Rejected']
 IND_ORDER = ['Retail, Electronics & Beauty', 'Food, FMCG & QSR', 'Healthcare', 'Health & Wellness', 'BFSI',
-             'Home improvement', 'Real Estate', 'Automotive', 'Hospitality', 'Airlines & Aviation']
+             'Home improvement', 'Real Estate', 'Automotive', 'Hospitality', 'Airlines & Aviation', 'Media, Entertainment & Consumer Internet', 'Education']
 TAB = {'Retail, Electronics & Beauty': 'Retail, Electronics & Beauty', 'Food, FMCG & QSR': 'Food, FMCG & QSR',
        'Healthcare': 'Healthcare', 'Health & Wellness': 'Health & Wellness', 'BFSI': 'BFSI',
        'Home improvement': 'Home improvement', 'Real Estate': 'Real Estate', 'Automotive': 'Automotive',
-       'Hospitality': 'Hospitality', 'Airlines & Aviation': 'Airlines & Aviation'}
+       'Hospitality': 'Hospitality', 'Airlines & Aviation': 'Airlines & Aviation', 'Media, Entertainment & Consumer Internet': 'Media, Telecom & Internet', 'Education': 'Education'}
 def tier(s): return 'A' if s >= 8 else 'B' if s >= 6 else 'C'
 HDR_FILL = PatternFill('solid', fgColor='1F2937'); HDR_FONT = Font(bold=True, color='FFFFFF')
 
@@ -43,7 +43,7 @@ MAIN = ['Company Name', 'Company Name for Emails', 'Industry', 'Website', 'Compa
         'Main Industry', 'Revenue (₹ Cr)', 'Revenue FY', 'Revenue Basis', 'Revenue Source', 'Ownership',
         'Parent Group', 'Key Brands', 'Why B2C', 'Consumer Signals', 'Data Confidence',
         'Check: Revenue ≥ ₹500 Cr', 'Check: Consumer-facing', 'Check: India HQ / India-led', 'Check: Not in TAM/Apollo/Exclusions/Groups',
-        'ICP Verdict', 'Zocket Fit Score (1-10)', 'Priority Tier', 'Lead Zocket Agent', 'Expansion Agent']
+        'ICP Verdict', 'Zocket Fit Score (1-10)', 'Priority Tier', 'Lead Zocket Agent', 'Expansion Agent', 'Source']
 W = {'Company Name': 34, 'Company Name for Emails': 28, 'Industry': 30, 'Website': 30, 'Company Linkedin Url': 38,
      'Revenue Source': 40, 'Key Brands': 34, 'Why B2C': 45, 'Consumer Signals': 45, 'Parent Group': 24,
      'Main Industry': 26, 'Lead Zocket Agent': 40, 'Expansion Agent': 30, 'Reason': 60}
@@ -55,7 +55,7 @@ def mainrow(r):
             r.get('industry'), round(r['revenue_inr_cr'], 1), r.get('revenue_fy'), r.get('revenue_basis'),
             r.get('revenue_source_url'), r.get('ownership'), r.get('parent_group'), r.get('key_brands'),
             r.get('b2c_rationale'), r.get('consumer_signals'), r.get('confidence'), ok, ok, ok, ok,
-            'Qualified', r['fit_score'], tier(r['fit_score']), r['lead_module'], r['expansion_module']]
+            'Qualified', r['fit_score'], tier(r['fit_score']), r['lead_module'], r['expansion_module'], r.get('source_tag')]
 
 def key(r): return (IND_ORDER.index(r['industry']) if r['industry'] in IND_ORDER else 99, r.get('sub_industry') or '', -r['fit_score'], -(r['revenue_inr_cr'] or 0))
 Q.sort(key=key)
