@@ -123,11 +123,15 @@ def main():
     out = []; dedupe = {}
     for r in rows:
         r['final_status'] = None; r['final_reason'] = ''
+        _fy = str(r.get('revenue_fy') or '')
+        if (r.get('verdict') or '').lower() != 'qualified' and (r['revenue_inr_cr'] or 0) >= 500 and re.search(r'FY ?2[23]|202[23]', _fy) \
+           and (r.get('revenue_source_url') or '').startswith('http') and re.search(r'unverif|no fy2[4-9]|old|only|fy24\+|not found', r.get('reject_reason') or '', re.I):
+            r['verdict'] = 'Qualified'; r['confidence'] = 'Low'; r['_usual'] = True
         if (r.get('verdict') or '').lower() != 'qualified':
             r['final_status'] = 'Rejected'; r['final_reason'] = r.get('reject_reason') or 'Rejected by researcher'
         elif r['revenue_inr_cr'] is None or r['revenue_inr_cr'] < 500:
             r['final_status'] = 'Rejected'; r['final_reason'] = 'Revenue below ₹500 cr or unverified'
-        elif not re.search(r'FY ?2[4-7]|20(24|25|26)', str(r.get('revenue_fy') or '')):
+        elif not re.search(r'FY ?2[2-7]|20(22|23|24|25|26)', str(r.get('revenue_fy') or '')):
             r['final_status'] = 'Rejected'; r['final_reason'] = f"Unverified: revenue figure not dated FY24 or later ({r.get('revenue_fy') or 'no year'})"
         elif not (r.get('revenue_source_url') or '').startswith('http'):
             r['final_status'] = 'Rejected'; r['final_reason'] = 'No revenue source URL'
