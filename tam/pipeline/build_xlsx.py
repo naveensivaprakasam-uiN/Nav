@@ -120,7 +120,7 @@ _Qn = {_m.nm(r['company_name']) for r in Q}
 def _clean(r):
     if _m.nm(r.get('company_name')) in _Qn: return False
     if _gv(r) or _m.group_match(r): return False
-    if _re.search(r'already|group|duplicate|b2b|not consumer|government|foreign|prescription|liquidat|defunct|closed|insolv|trust|ngo|subsidiary|holding', r.get('final_reason',''), _re.I): return False
+    if _re.search(r'already|group|duplicate|b2b|not consumer|government|foreign|prescription|liquidat|defunct|closed|insolv|trust|ngo|subsidiary|holding|obviously|skipped|small', r.get('final_reason',''), _re.I): return False
     k, s = _m.seen_match(r)
     return k != 'strong'
 _seen = set(); P = []; N = []
@@ -148,3 +148,41 @@ for _t in ('Probable (unverified rev)', 'Near-miss ₹300-499 Cr'):
     _wb.move_sheet(_t, offset=_tgt - _cur)
 _wb.save(OUT)
 print('extra tabs: probable', len(P), 'near-miss', len(N))
+
+# ---- Mall & Airport brand coverage tab
+import glob as _g, json as _j
+from load import nm as _nm
+_wb = _lw(OUT)
+_M = {_nm(r['company_name']): r for r in rows}
+_cg = {_nm(r['company_name']): r for r in _j.load(open('cand_gap.json'))}
+_ms = []
+for _f in sorted(_g.glob('triage/gap_mall_*.jsonl')):
+    for _l in open(_f):
+        try: _r = _j.loads(_l)
+        except Exception: continue
+        _k = _nm(_r['company_name']); _m = _M.get(_k); _c = _cg.get(_k, {})
+        if not _m:
+            _p = _k.replace(' ', '')[:7]
+            _m = next((v for kk, v in _M.items() if kk.replace(' ', '').startswith(_p)), None) if len(_p) >= 6 else None
+        st = _c.get('status', '')
+        if _m and _m['final_status'] == 'Qualified' and not st.startswith(('known','group')): s, d = 'NEW – in this list', f"₹{_m['revenue_inr_cr']:,.0f} Cr {_m.get('revenue_fy')}"
+        elif st.startswith('known'):
+            src = st.split(':')[1] if ':' in st else ''
+            s = 'Already in your TAM (723)' if src == 'TAM723' else 'Excluded (customer/pipeline/account list)'; d = st.split(':', 2)[-1]
+        elif st.startswith('group'): s, d = 'Excluded group', st.split(':', 1)[1]
+        elif st == 'round1' or st.startswith('in_'):
+            s, d = 'Covered by another row', ''
+        elif _m: s, d = ('Checked – no public revenue figure (see Probable tab)' if __import__('re').search('unverif|not found|no fy', _m['final_reason'], __import__('re').I) else 'Checked – not added'), _m['final_reason']
+        else: s, d = 'Not checked (est. under ₹500 Cr)', ''
+        _ms.append([_r.get('brand_name') or _r['company_name'], _r.get('key_brands'), _r['company_name'], _r.get('industry'), _r.get('sub_industry'), s, d])
+_ws = _wb.create_sheet('Mall & Airport Brands')
+_ws.append(['Brand (as seen in malls/airports)', 'All brands run by operator', 'India operating company', 'Main Industry', 'Sub-industry', 'Status', 'Detail'])
+for c in _ws[1]: c.fill = HDR_FILL; c.font = HDR_FONT
+for x in sorted(_ms, key=lambda x: (x[5], x[3] or '', x[0] or '')): _ws.append(x)
+for i, w in enumerate([30, 50, 40, 26, 30, 34, 60], 1): _ws.column_dimensions[get_column_letter(i)].width = w
+_ws.freeze_panes = 'A2'; _ws.auto_filter.ref = _ws.dimensions
+_cur = _wb.sheetnames.index('Mall & Airport Brands'); _tgt = _wb.sheetnames.index('Probable (unverified rev)')
+_wb.move_sheet('Mall & Airport Brands', offset=_tgt - _cur)
+_wb.save(OUT)
+import collections as _co
+print('mall tab', len(_ms), _co.Counter(x[5] for x in _ms))

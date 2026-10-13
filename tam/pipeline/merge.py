@@ -140,7 +140,7 @@ def main():
             if is_govt(r):
                 r['final_status'] = 'Rejected'; r['final_reason'] = 'Government / PSU / non-profit entity (user rule: excluded)'
         if not r['final_status']:
-            g = group_match(r)
+            g = None if re.search(r'dealer|dealership|franchisee', str(r.get('sub_industry') or '') + ' ' + str(r.get('parent_group') or ''), re.I) and not group_match({'company_name': r.get('company_name')}) else group_match(r)
             if g:
                 r['final_status'] = 'Rejected'; r['final_reason'] = f'Group excluded: {g[0]} (trigger: {g[1]}; matched "{g[2]}")'
         if not r['final_status']:
