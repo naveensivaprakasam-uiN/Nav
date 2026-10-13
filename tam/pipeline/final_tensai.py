@@ -39,6 +39,7 @@ CAT = {  # code -> (verdict, reason)
     'LOW': (V_NO, 'Revenue below ₹500 Cr'),
     'NOREV': (V_NO, 'Revenue not verifiable – no public filed figure'),
     'B2B': (V_NO, 'Not B2C – B2B / manufacturer / exporter / captive'),
+    'DEALER': (V_NO, 'Car dealer – brand advertising is run by the carmaker'),
     'LOWFIT': (V_NO, 'Low fit for Zocket – limited consumer marketing need'),
     'FOR': (V_NO, 'Foreign company – no India-led marketing (back office, franchise or HQ-run)'),
 }
@@ -108,6 +109,18 @@ for n, (c, d) in json.load(open('tensai/sheet2_codes.json')).items():
     if c == 'I' and d.startswith('Already in '): continue  # recomputed below
     MAN.setdefault(n, (c, d))
 
+# user decisions (latest)
+DEALERS = ['Kalyani motors', 'BHANDARI AUTOMOBILES PVT. LTD.', 'Kataria Automobiles Private Limited', 'AMP Motors', 'Galaxy Toyota',
+           'Harsha Toyota AP & Telangana', 'Arvind Motors Pvt Ltd - TATA Dealers', 'Apra Auto (I) Pvt Ltd', 'MyCar (Pune) Pvt. Ltd.',
+           'Anaamalais Toyota', 'DD Motors Official', 'India Garage - VST Group', 'PREMSONS MOTOR UDYOG PRIVATE LIMITED', 'Sireesh Auto',
+           'Thirty Six Toyota', 'The Sachdev Group (TSG Automotive)', 'Sree Gokulam Motors & Services Pvt. Ltd.', 'Trident Automobiles',
+           'GlobeToyota', 'Kuttukaran Group']
+for d in DEALERS:
+    MAN[d] = ('DEALER', MAN.get(d, (None, ''))[1] if MAN.get(d, (None, ''))[0] == 'Q' else '')
+MAN['Indel Money'] = ('LOWFIT', '₹606 Cr FY26 – branch-led gold-loan lender with limited digital/brand marketing')
+MAN['Marwadi Shares and Finance Ltd.'] = ('LOWFIT', '₹891 Cr FY25 – regional broker, limited brand marketing need')
+MAN['BNew Mobiles Pvt.Ltd'] = ('LOWFIT', '₹1,250–1,500 Cr band – regional mobile retailer, limited marketing need')
+
 # ---------- list matching ----------
 def clean(n): return re.sub(r'\(.*?\)', ' ', n or '').replace('ABC - ', '')
 def keys(n):
@@ -136,7 +149,7 @@ def from_notes(note, trev):
     if re.search(r'government|\bpsu\b|state-owned|public.sector|gov-owned|govt|co-?operative society|trust-run|not-for-profit|non-profit|\bngo\b|section.?8|society', t): return 'GOV'
     if re.search(r'\bhnis?\b|uhni|ultra-?hni|wealthy clients|family office|private bank|private wealth', t): return 'HNI'
     if re.search(r'msme|sme lend|business-borrower|business loans|corporate lending|venture-debt', t): return 'MSME'
-    if re.search(r'car.dealer|dealer with|nexa|dealership|dealers (are )?rejected|dealer group|(maruti|suzuki|toyota|tata motors|hyundai|mahindra|jlr|honda|kia) (suzuki )?dealer', t): return 'NOREV'
+    if re.search(r'car.dealer|dealer with|nexa|dealership|dealers (are )?rejected|dealer group|(maruti|suzuki|toyota|tata motors|hyundai|mahindra|jlr|honda|kia) (suzuki )?dealer', t): return 'DEALER'
     if re.search(r'prescription|\brx\b|hcp|medical.device|doctor-prescribed|hospitals? (and|&) labs', t): return 'K'
     if re.search(r'no india\b|not present in india|geography rule|no indian (operations|entity|retail|stores|team|presence)|exited|decision-?makers (are )?(in|outside|abroad)|marketing is (run|set|controlled) (globally|from)|no own india', t): return 'FOR'
     if re.search(r'b2b|manufactur|exporter|export|wholesale|distribut|saas|software|infrastructure|platform for|institutional|contract|oem|industrial|merchant|payment gateway|agency|services provider|consult|sourcing|trading|outsourc|supplier|refin|captive|capability (centre|center|hub)|back-?office|gcc|technology cent', t): return 'B2B'
