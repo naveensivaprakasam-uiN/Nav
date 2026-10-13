@@ -15,6 +15,7 @@ BUCKET = [  # (summary group, matcher on reason)
  ('Government / PSU / non-profit', lambda r, d: r.startswith('Government')),
  ('Defunct, merged or insolvent', lambda r, d: r.startswith('Defunct')),
  ('Name too generic to identify', lambda r, d: r.startswith('Name too generic')),
+ ('Low fit for Zocket – limited consumer marketing need', lambda r, d: r.startswith('Low fit')),
 ]
 def clean_note(d):
     s = re.split(r'(?<=[.;–])\s+', d or '')

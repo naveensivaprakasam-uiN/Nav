@@ -39,6 +39,7 @@ CAT = {  # code -> (verdict, reason)
     'LOW': (V_NO, 'Revenue below ₹500 Cr'),
     'NOREV': (V_NO, 'Revenue not verifiable – no public filed figure'),
     'B2B': (V_NO, 'Not B2C – B2B / manufacturer / exporter / captive'),
+    'LOWFIT': (V_NO, 'Low fit for Zocket – limited consumer marketing need'),
     'FOR': (V_NO, 'Foreign company – no India-led marketing (back office, franchise or HQ-run)'),
 }
 
@@ -57,7 +58,7 @@ MAN.update({
     'Branch International': ('Q', '₹832 Cr FY25 (Tracxn) – personal-loan app, 5 Cr+ users'),
     'Galderma': ('Q', '₹1,250–1,500 Cr FY25 band (MCA via Tofler) – Cetaphil, India-run marketing'),
     'OTTO Clothing Pvt Ltd': ('Q', '₹750–1,000 Cr FY25 band (MCA via Tofler) – menswear brand'),
-    'Dhanlaxmi Bank Limited': ('Q', '₹1,601 Cr FY26 total income – private retail bank, Kerala'),
+    'Dhanlaxmi Bank Limited': ('LOWFIT', '₹1,601 Cr FY26 – conservative regional bank with limited brand/creative marketing'),
     'Shubham Housing Development Finance Company': ('Q', '₹824 Cr FY25 (Inc42; ICRA) – affordable home loans'),
     'Kuttukaran Group': ('TAM', 'Popular Vehicles & Services is in Zocket TAM'),
     'India Garage - VST Group': ('I', 'VST group – V.S.T. Motors added to Zocket TAM'),

@@ -19,7 +19,7 @@ for o in O:
 QO = list(Q.values())
 RO = ['Below ₹500 Cr revenue', 'Not B2C (B2B, manufacturer, exporter, fintech infra, MSME lender, Rx pharma)',
       'Foreign company – marketing not run from India', 'Serves only HNI / institutional clients', RJ_GROUP,
-      'Government / PSU / non-profit', 'Defunct, merged or insolvent', 'Revenue not verifiable (no public figure)', 'Name too generic to identify']
+      'Government / PSU / non-profit', 'Defunct, merged or insolvent', 'Revenue not verifiable (no public figure)', 'Name too generic to identify', 'Low fit for Zocket – limited consumer marketing need']
 assert all(r['why'] in QO + RO for r in rows), {r['why'] for r in rows} - set(QO + RO)
 N = len(rows); qc = collections.Counter(r['why'] for r in rows if r['st'] == 'Qualified'); rc = collections.Counter(r['why'] for r in rows if r['st'] == 'Rejected')
 nq, nr = sum(qc.values()), sum(rc.values())
