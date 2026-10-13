@@ -8,6 +8,16 @@ from openpyxl.utils import get_column_letter
 OUT = sys.argv[1]
 M = json.load(open('merged.json'))
 Q = [r for r in M if r['final_status'] == 'Qualified']
+# optional: argv[2] = existing list xlsx -> output only rows from round 10 not already in it
+if len(sys.argv) > 2:
+    import csv
+    from merge import core
+    from load import dom
+    B = list(csv.DictReader(open(sys.argv[2], encoding='utf-8-sig')))
+    base = {k for b in B for k in (nm(b['Company Name']), core(nm(b['Company Name'])), nm(b['Company Name For Emails'])) if len(k) >= 5}
+    bdom = {dom(b['Website']) for b in B if b['Website']}
+    Q = [r for r in Q if r['_file'].startswith('r10_') and not ({nm(r['company_name']), core(nm(r['company_name'])), nm(r.get('brand_name') or '')} & base)
+         and dom(r.get('website')) not in bdom]
 RC = {}
 for f in glob.glob('round9/recheck_out_*.jsonl'):
     for l in open(f):
@@ -40,7 +50,7 @@ F.sort(key=lambda r: (IND.index(r['industry']) if r['industry'] in IND else 99, 
 H = ['#', 'Company Name', 'Company Name for Emails', 'Industry', 'Sub-industry', 'Website', 'Company Linkedin Url', 'Company City',
      'Company State', 'Company Country', 'Annual Revenue (₹ Cr)', 'Annual Revenue (USD)', 'Revenue Year', 'Revenue Source', 'Data Confidence',
      'Ownership', 'Parent Group', 'Key Brands', 'Why Consumer-facing', 'Zocket Fit Score (1-10)', 'Priority Tier', 'Lead Zocket Agent', 'Source']
-wb = Workbook(); ws = wb.active; ws.title = 'Final ICP List'
+wb = Workbook(); ws = wb.active; ws.title = 'Expansion List' if len(sys.argv) > 2 else 'Final ICP List'
 ws.append(H)
 for c in ws[1]:
     c.fill = PatternFill('solid', fgColor='1F2937'); c.font = Font(bold=True, color='FFFFFF'); c.alignment = Alignment(wrap_text=True, vertical='center')
