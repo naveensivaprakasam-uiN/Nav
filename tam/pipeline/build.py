@@ -44,6 +44,12 @@ for t in T:
             st = 'KEEP' if x['verdict'] == 'KEEP' else 'REMOVE'
             rev, src = x.get('revenue_inr_cr') or '', x.get('source_url') or ''
             why = ('Verified – ' if st == 'KEEP' else '') + (x.get('reason') or '')
+        OV = {'Kamdhenu Limited': ('REMOVE', 'Not B2C – TMT steel (paints business demerged)'),
+              'Del Monte Foods Private Limited': ('DUP', 'Duplicate – owned by Sundrop Brands (Agro Tech Foods) already in TAM'),
+              'Sahyadri Hospitals': ('ZOCKET', 'Group already with Zocket – Manipal (now owner) in lists'),
+              'Augmont | Gold For All': ('REMOVE', 'Not B2C – revenue mostly B2B bullion trading'),
+              'BGS Gleneagles': ('DUP', 'Duplicate – IHH group, same as Fortis already in TAM')}
+        if n in OV: st, why = OV[n]
     rows.append(dict(t=t, part=part, st=st, why=why, rev=rev, src=src))
 H = list(T[0].keys())
 H = [h for h in H if h]
@@ -74,7 +80,18 @@ for st in order:
     s.append([STATUS[st], a, b, a + b])
 s.append(['Total', sum(v for (p, _), v in c.items() if p.startswith('Original')), sum(v for (p, _), v in c.items() if p.startswith('Expansion')), len(rows)])
 s.append([]); s.append(['Removal reasons', 'Rows']); [setattr(x, 'font', Font(bold=True)) for x in s[s.max_row]]
-why = collections.Counter(r['why'] for r in rows if r['st'] in ('REMOVE', 'DUP', 'ZOCKET'))
+import re
+def bucket(r):
+    w = r['why']
+    if r['st'] == 'DUP': return 'Duplicate of another row'
+    if r['st'] == 'ZOCKET': return 'Already with Zocket (account list / pipeline / group company)'
+    if w.startswith('Car dealer'): return 'Car dealer (carmaker runs advertising)'
+    if w.startswith('Government'): return 'Government / PSU'
+    if w.startswith('Excluded by rule'): return 'Excluded by rule (Zepto, Zomato/Blinkit, malls)'
+    if re.search(r'(?i)no verifiable', w): return 'No verifiable revenue figure'
+    if re.search(r'(?i)not b2c|b2b|manufactur|rx|foreign|industrial|insolvent|distressed|dsa|hni|msme', w): return 'Not B2C (B2B, manufacturer, exporter, Rx pharma, industrial)'
+    return 'Revenue below ₹500 Cr'
+why = collections.Counter(bucket(r) for r in rows if r['st'] in ('REMOVE', 'DUP', 'ZOCKET'))
 for k, v in why.most_common(): s.append([k, v])
 s.column_dimensions['A'].width = 80; s.column_dimensions['B'].width = 20; s.column_dimensions['C'].width = 20
 wb.save('/home/user/Nav/tam/Zocket_TAM_Recleaned.xlsx')
