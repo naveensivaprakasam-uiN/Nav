@@ -13,6 +13,28 @@ for f in glob.glob('batches/res_*.jsonl'):
         except Exception: pass
 EXC = {'Clove Dental': ('KEEP', 450, 'FY26', '', 'Yes – dental clinic chain (600+ clinics)',
                         'Exception approved by Zocket: ₹450 Cr FY26, projected ₹600 Cr, ~200 live ads')}
+NEEDCALL = {'Nissan Motor India Pvt Ltd', 'Sri Vijaya Visakha Milk Producers Company Ltd (Visakha Dairy)', 'The Chennai Silks', 'Unicharm India Pvt Ltd',
+            'Adidas India Pvt Ltd', 'Abharan Jewellers Pvt Ltd', 'Dell Technologies India', 'Transsion India (itel)', 'Haleon India Pvt Ltd', 'Nivea Skincare (Beiersdorf India)',
+            'Yamaha Motor India Sales Pvt Ltd', 'EssilorLuxottica India', 'Stellantis India (PCA Automobiles India Pvt Ltd)',
+            'Michelin India Tyre Private Limited', 'BYD India Private Limited', 'GM MODULAR', 'Shree Baidyanath Ayurvedic Pvt. Ltd.'}
+FIX = {
+ 'Liberty General Insurance': ('KEEP', 2814.8, 'FY26', 'https://uatcdn.angelone.in/news/market-updates/liberty-mutual-raises-ownership-in-liberty-general-insurance-to-74', 'Yes – motor/health insurance', 'Gross direct premium ₹2,815 Cr FY26 (General Insurance Council data)'),
+ 'Kauvery Hospital': ('KEEP', 847, 'FY22', 'https://startup.outlookindia.com/investors/iifl-pe-fund-to-invest-rs-500-600-crore-in-kauvery-hospital-news-7099', 'Yes – hospital chain', 'Consolidated revenue ₹847 Cr FY22 (Brickwork, via news) – older figure'),
+ 'IndiaFirst Life': ('REMOVE', '', '', '', '', 'Government-controlled – Bank of Baroda (PSU) holds majority'),
+ 'Star Union Dai-ichi Life Insurance Company Limited': ('REMOVE', '', '', '', '', 'Government-controlled – Bank of India & Union Bank (PSUs) hold majority'),
+ 'Apollo Diagnostics': ('ZOCKET', '', '', '', '', 'Group already with Zocket – Apollo Hospitals (parent) in account list'),
+ 'Apollo Pharmacy': ('ZOCKET', '', '', '', '', 'Group already with Zocket – Apollo Hospitals (parent) in account list'),
+ 'Apollo Health and Lifestyle Limited': ('ZOCKET', '', '', '', '', 'Group already with Zocket – Apollo Hospitals (parent) in account list'),
+ 'Ferns N petals': ('ZOCKET', '', '', '', '', 'Already with Zocket – FNP in account list and pipeline'),
+ 'Westlife Foodworld': ('ZOCKET', '', '', '', '', 'Group already with Zocket – Hardcastle Restaurants (McDonald\'s, its subsidiary) in account list'),
+ 'Aster DM Healthcare, India': ('ZOCKET', '', '', '', '', 'Group already with Zocket – CARE Hospitals (merged into Aster) in account list'),
+ 'ITC Limited': ('ZOCKET', '', '', '', '', 'Group already with Zocket – ITC Hotels in account list'),
+ 'Zydus Wellness': ('ZOCKET', '', '', '', '', 'Group already with Zocket – Zydus Lifesciences (parent) in account list'),
+ 'Home Centre India': ('ZOCKET', '', '', '', '', 'Group already with Zocket – Landmark Group (active connection)'),
+ 'Mahindra & Mahindra Ltd., FES, Swaraj Division': ('ZOCKET', '', '', '', '', 'Group already with Zocket – Mahindra in account list'),
+ 'JM Financial Limited': ('KEEP', 4223, 'FY26', 'https://www.screener.in/company/JMFINANCIL/consolidated/', 'Yes – retail broking, wealth & home loans', 'Listed – JM Financial revenue ₹4,223 Cr FY26 (screener)'),
+}
+OLDFIG = {'Nissan Motor India Pvt Ltd', 'Sri Vijaya Visakha Milk Producers Company Ltd (Visakha Dairy)', 'The Chennai Silks', 'Unicharm India Pvt Ltd', 'Adidas India Pvt Ltd', 'Abharan Jewellers Pvt Ltd'}
 TODAY = datetime.date.today().strftime('%d-%b-%Y')
 rows = []
 for x in M:
@@ -21,6 +43,11 @@ for x in M:
     st = rev = fy = src = b2c = why = ''
     if n in EXC:
         st, rev, fy, src, b2c, why = EXC[n]
+    elif n in FIX:
+        st, rev, fy, src, b2c, why = FIX[n]
+    elif n in NEEDCALL:
+        st, why = 'CALL', ('Only an old (pre-FY22) revenue figure is public – confirm current scale before calling' if n in OLDFIG else
+                           'Large consumer brand but no India-entity revenue figure is public – confirm before calling')
     elif n in RES:
         r = RES[n]
         st = r['verdict']; rev = r.get('revenue_inr_cr') or ''; fy = r.get('revenue_fy') or ''
@@ -48,8 +75,8 @@ for x in M:
                      website=b.get('Website', ''), li=b.get('Company LinkedIn URL', ''), city=b.get('Company City', ''),
                      st=st, rev=rev, fy=fy, src=src, b2c=b2c, why=why))
 LBL = {'KEEP': 'Verified – ICP (OK to call)', 'REMOVE': 'Remove – not ICP', 'ZOCKET': "Remove – already with Zocket (don't call)",
-       'DUP': 'Remove – duplicate', 'CHECK': 'Pending check'}
-COL = {'KEEP': 'DCFCE7', 'REMOVE': 'FEE2E2', 'ZOCKET': 'FEF3C7', 'DUP': 'FEE2E2', 'CHECK': 'E0E7FF'}
+       'DUP': 'Remove – duplicate', 'CHECK': 'Pending check', 'CALL': 'Needs your call'}
+COL = {'KEEP': 'DCFCE7', 'REMOVE': 'FEE2E2', 'ZOCKET': 'FEF3C7', 'DUP': 'FEE2E2', 'CHECK': 'E0E7FF', 'CALL': 'FEF9C3'}
 HDR = PatternFill('solid', fgColor='1F2937')
 def head(ws, h):
     ws.append(h)
@@ -57,7 +84,7 @@ def head(ws, h):
 wb = Workbook(); s = wb.active; s.title = 'Summary'
 H = ['Batch', 'Company Name', 'Company Name for Emails', 'Industry', 'Website', 'Company LinkedIn URL', 'City', 'Status', 'Revenue (₹ Cr)',
      'Revenue FY', 'Revenue source (link)', 'Sells to consumers?', 'Reason']
-order = ['KEEP', 'CHECK', 'ZOCKET', 'REMOVE', 'DUP']
+order = ['KEEP', 'CALL', 'CHECK', 'ZOCKET', 'REMOVE', 'DUP']
 def put(ws, sel, verified_col=False):
     head(ws, H + (['Verified on'] if verified_col else []))
     for r in sorted(sel, key=lambda r: (r['batch'], order.index(r['st']), r['industry'], r['name'].lower())):
